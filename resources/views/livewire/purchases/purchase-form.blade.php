@@ -14,10 +14,25 @@
 
     <form class="space-y-6">
         <!-- Header Details -->
-        <div class="glass-card p-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="glass-card p-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- Invoice Basis -->
+                <div>
+                    <label class="form-label">Purchase Basis <span class="text-red-400">*</span></label>
+                    <div class="flex items-center gap-6 mt-2">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" wire:model="invoiceBasis" value="credit" class="w-4 h-4 text-primary bg-transparent border-white/20 focus:ring-primary focus:ring-offset-surface">
+                            <span class="text-sm text-text-secondary">Credit (Pay Later)</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" wire:model="invoiceBasis" value="cash" class="w-4 h-4 text-primary bg-transparent border-white/20 focus:ring-primary focus:ring-offset-surface">
+                            <span class="text-sm text-text-secondary">Cash (Paid Immediately)</span>
+                        </label>
+                    </div>
+                </div>
+
                 <!-- Vendor Selection -->
-                <div class="md:col-span-1">
+                <div>
                     <label class="form-label flex items-center justify-between">
                         Vendor <span class="text-red-400">*</span>
                         @if(!$showNewContactInput)
@@ -41,27 +56,29 @@
                         @error('contactId') <p class="mt-1.5 text-xs text-red-400">{{ $message }}</p> @enderror
                     @endif
                 </div>
+            </div>
                 
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Bill Number -->
-                <div class="md:col-span-1">
+                <div>
                     <label class="form-label">Bill / Invoice Number <span class="text-red-400">*</span></label>
                     <input wire:model="billNumber" type="text" class="form-input uppercase" placeholder="INV-2342">
                     @error('billNumber') <p class="mt-1.5 text-xs text-red-400">{{ $message }}</p> @enderror
                 </div>
 
                 <!-- Dates -->
-                <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div>
-                        <label class="form-label">Bill Date <span class="text-red-400">*</span></label>
-                        <input wire:model="billDate" type="text" x-data="datepicker" class="form-input">
-                        @error('billDate') <p class="mt-1.5 text-xs text-red-400">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="form-label">Due Date <span class="text-red-400">*</span></label>
-                        <input wire:model="dueDate" type="text" x-data="datepicker" class="form-input">
-                        @error('dueDate') <p class="mt-1.5 text-xs text-red-400">{{ $message }}</p> @enderror
-                    </div>
+                <div>
+                    <label class="form-label">Bill Date <span class="text-red-400">*</span></label>
+                    <input wire:model="billDate" type="text" x-data="datepicker" class="form-input">
+                    @error('billDate') <p class="mt-1.5 text-xs text-red-400">{{ $message }}</p> @enderror
                 </div>
+                @if($invoiceBasis !== 'cash')
+                <div class="space-y-1.5">
+                    <label class="block text-sm font-medium text-text-secondary">Due Date <span class="text-red-400">*</span></label>
+                    <input wire:model="dueDate" type="text" x-data="datepicker" class="form-input">
+                    @error('dueDate') <p class="mt-1.5 text-xs text-red-400">{{ $message }}</p> @enderror
+                </div>
+                @endif
             </div>
         </div>
 
@@ -90,7 +107,13 @@
                                             <option value="{{ $product['id'] }}">{{ $product['name'] }}</option>
                                         @endforeach
                                     </select>
-                                    <input wire:model.live="items.{{ $index }}.description" type="text" class="form-input py-1.5 text-xs bg-transparent border-dashed border-white/10 focus:border-accent" placeholder="Item description (optional)">
+                                    @if(!$item['product_id'])
+                                        <div class="text-sm text-text-muted mt-1 px-1">Please select a product above</div>
+                                    @endif
+                                    @if(auth()->user()->currentOrganization->gst_number)
+                                        <input wire:model.live="items.{{ $index }}.hsn_code" type="text" class="form-input py-1.5 text-sm w-full" placeholder="HSN/SAC *">
+                                    @endif
+                                    <input wire:model.live="items.{{ $index }}.description" type="text" class="form-input py-1.5 text-xs bg-transparent border-dashed border-white/10 focus:border-accent w-full" placeholder="Item description (optional)">
                                 </div>
                             </td>
                             <td class="px-4 py-3 align-top">

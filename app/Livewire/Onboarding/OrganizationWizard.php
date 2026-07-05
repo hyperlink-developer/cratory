@@ -24,9 +24,9 @@ class OrganizationWizard extends Component
     public string $orgType = '';
     public string $businessCategory = '';
 
-    // Step 2: Tax details
     public string $panNumber = '';
     public string $gstNumber = '';
+    public bool $isComposition = false;
 
     // Step 3: Address
     public string $addressLine1 = '';
@@ -57,6 +57,7 @@ class OrganizationWizard extends Component
             2 => [
                 'panNumber' => 'required|string|size:10|regex:/^[A-Z]{5}[0-9]{4}[A-Z]$/',
                 'gstNumber' => 'nullable|string|size:15|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/',
+                'isComposition' => 'boolean',
             ],
             3 => [
                 'addressLine1' => 'required|string|max:255',
@@ -135,6 +136,7 @@ class OrganizationWizard extends Component
                 'business_category' => $this->businessCategory,
                 'pan_number' => strtoupper($this->panNumber),
                 'gst_number' => $this->gstNumber ? strtoupper($this->gstNumber) : null,
+                'is_composition_tax_payer' => $this->isComposition,
                 'address_line_1' => $this->addressLine1,
                 'address_line_2' => $this->addressLine2 ?: null,
                 'city' => $this->city,

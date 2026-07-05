@@ -18,8 +18,16 @@ class PdfController extends Controller
         // Eager load relations
         $invoice->load(['organization', 'contact', 'items.product', 'items.taxRate']);
 
-        // Load the default template for the organization
-        $template = $invoice->organization->invoiceTemplates()->where('is_default', true)->first();
+        // Check for template_id in query parameters
+        $template = null;
+        if ($request->has('template_id')) {
+            $template = $invoice->organization->invoiceTemplates()->find($request->query('template_id'));
+        }
+
+        // Load the default template for the organization if not provided or found
+        if (!$template) {
+            $template = $invoice->organization->invoiceTemplates()->where('is_default', true)->first();
+        }
         
         if (!$template) {
             $template = new \App\Models\InvoiceTemplate([
@@ -28,8 +36,17 @@ class PdfController extends Controller
             ]);
         }
 
+        // Override show_fields if provided in query parameters
+        if ($request->has('show_fields')) {
+            $template->show_fields = array_merge($template->show_fields ?? [], $request->query('show_fields'));
+        }
+
         // Pass data to view
         $viewName = $template->slug ? "pdf.templates.{$template->slug}" : 'pdf.templates.standard';
+        
+        if (!view()->exists($viewName)) {
+            $viewName = 'pdf.templates.standard';
+        }
         
         $pdf = Pdf::loadView($viewName, [
             'invoice' => $invoice,

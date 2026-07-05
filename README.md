@@ -13,14 +13,16 @@ Because this project is public but restricted, please note the following before 
 
 ## 🚀 Features
 
-- **Smart Invoicing:** Create, edit, and manage sales and service invoices.
-- **Customizable PDF Templates:** Generate professional PDFs with 4 unique templates (Standard, Modern, Minimal, Elegant). Customize colors, fonts, and toggle specific fields (like shipping addresses or tax details).
-- **Responsive Line Items:** A bulletproof responsive UI that provides a seamless, side-by-side table on desktop and beautifully stacked cards on mobile devices.
-- **Unsaved Changes Protection:** Built-in safeguards that warn you if you attempt to leave the page with unsaved form data.
-- **Editable Invoice Numbers:** Intelligent auto-generation of sequence numbers with the flexibility to override them manually.
-- **Quick Add Capabilities:** Instantly add new customers or line items directly from the invoice creation form without breaking your workflow.
-- **Multi-tenant Architecture:** Full support for managing multiple organizations.
-- **Robust Security:** Powered by Laravel Fortify for secure authentication.
+- **Comprehensive Billing:** Create, edit, and manage Sales Invoices and Purchase Bills supporting both Credit and Cash basis.
+- **Automated Inventory:** Real-time stock tracking with automatic stock movements (`PurchaseIn` and `SaleOut`) directly tied to billing.
+- **Financial Accounting:** Automated double-entry ledger system. Every invoice, purchase, payment voucher, and receipt automatically posts corresponding journal entries.
+- **Payments & Receipts:** Easily manage vendor payments via Vouchers and customer collections via Receipts with automatic bill allocation.
+- **Robust Reporting:** Generate detailed financial reports including Profit & Loss, Trial Balance, Balance Sheet, Sales, and Purchases with PDF and CSV export options.
+- **Mobile-First UI:** A beautifully crafted, responsive interface using Tailwind CSS and Livewire, providing a seamless experience across desktop and mobile devices.
+- **Customizable PDF Templates:** Generate professional PDFs with multiple unique templates. Customize colors, fonts, and toggle specific fields (like shipping addresses or tax details).
+- **Multi-tenant Architecture:** Full support for managing multiple organizations and branches.
+- **Advanced Tax Handling:** Built-in support for standard GST, Composition schemes, and HSN/SAC codes.
+- **Robust Security:** Powered by Laravel for secure authentication and authorization.
 
 ## 🛠 Tech Stack
 

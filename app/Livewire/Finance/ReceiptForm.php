@@ -36,6 +36,7 @@ class ReceiptForm extends Component
         
         if ($value) {
             $this->openInvoices = Invoice::where('contact_id', $value)
+                ->where('invoice_basis', 'credit')
                 ->where('balance_due', '>', 0)
                 ->where('status', '!=', 'draft')
                 ->where('status', '!=', 'cancelled')
@@ -87,7 +88,7 @@ class ReceiptForm extends Component
                 'organization_id' => $org->id,
                 'contact_id' => $this->contactId,
                 'receipt_number' => $generator->generate($org, 'REC'),
-                'payment_date' => $this->paymentDate,
+                'receipt_date' => $this->paymentDate,
                 'payment_mode' => $this->paymentMode,
                 'reference_number' => $this->reference,
                 'amount' => $this->amountReceived,
@@ -115,6 +116,9 @@ class ReceiptForm extends Component
                     }
                 }
             }
+            
+            // Post to ledger
+            app(\App\Services\LedgerService::class)->postReceipt($receipt);
         });
 
         $this->dispatch('notify', ['message' => 'Receipt created successfully.']);

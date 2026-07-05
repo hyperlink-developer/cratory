@@ -36,6 +36,7 @@ class VoucherForm extends Component
         
         if ($value) {
             $this->openBills = PurchaseInvoice::where('contact_id', $value)
+                ->where('invoice_basis', 'credit')
                 ->where('balance_due', '>', 0)
                 ->where('status', '!=', 'draft')
                 ->where('status', '!=', 'cancelled')
@@ -86,7 +87,7 @@ class VoucherForm extends Component
                 'organization_id' => $org->id,
                 'contact_id' => $this->contactId,
                 'voucher_number' => $generator->generate($org, 'PAY'),
-                'payment_date' => $this->paymentDate,
+                'voucher_date' => $this->paymentDate,
                 'payment_mode' => $this->paymentMode,
                 'reference_number' => $this->reference,
                 'amount' => $this->amountPaid,
@@ -113,6 +114,9 @@ class VoucherForm extends Component
                     }
                 }
             }
+            
+            // Post to ledger
+            app(\App\Services\LedgerService::class)->postPaymentVoucher($voucher);
         });
 
         $this->dispatch('notify', ['message' => 'Payment voucher created successfully.']);

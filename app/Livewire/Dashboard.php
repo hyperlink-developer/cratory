@@ -52,6 +52,7 @@ class Dashboard extends Component
         return [
             'total_sales' => $totalSales,
             'total_purchases' => $totalPurchases,
+            'net_profit' => $totalSales - $totalPurchases,
             'total_receivable' => $totalReceivable,
             'total_payable' => $totalPayable,
         ];
@@ -113,13 +114,43 @@ class Dashboard extends Component
             ->get();
     }
 
+    public function getChartDataProperty(): array
+    {
+        // Sales and Purchases over the last 6 months
+        $months = [];
+        $salesData = [];
+        $purchasesData = [];
+
+        for ($i = 5; $i >= 0; $i--) {
+            $monthStart = Carbon::now()->subMonths($i)->startOfMonth();
+            $monthEnd = Carbon::now()->subMonths($i)->endOfMonth();
+            
+            $months[] = $monthStart->format('M Y');
+            
+            $salesData[] = Invoice::whereBetween('invoice_date', [$monthStart, $monthEnd])
+                ->whereNotIn('status', ['draft', 'cancelled'])
+                ->sum('grand_total');
+
+            $purchasesData[] = PurchaseInvoice::whereBetween('purchase_date', [$monthStart, $monthEnd])
+                ->whereNotIn('status', ['draft', 'cancelled'])
+                ->sum('grand_total');
+        }
+
+        return [
+            'categories' => $months,
+            'sales' => $salesData,
+            'purchases' => $purchasesData,
+        ];
+    }
+
     public function render()
     {
         return view('livewire.dashboard', [
             'kpis' => $this->kpi,
             'recentActivity' => $this->recent_activity,
             'overdueInvoices' => $this->overdue_invoices,
-            'lowStock' => $this->low_stock_products
+            'lowStock' => $this->low_stock_products,
+            'chartData' => $this->chart_data,
         ])->layout('components.layouts.app', ['title' => 'Dashboard']);
     }
 }
