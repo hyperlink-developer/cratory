@@ -1,0 +1,34 @@
+<?php
+
+namespace App\Models;
+
+use App\Enums\PaymentMode;
+use App\Traits\BelongsToOrganization;
+use App\Traits\HasUuid;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class PaymentVoucher extends Model
+{
+    use BelongsToOrganization, HasUuid, SoftDeletes;
+
+    protected $fillable = [
+        'organization_id', 'voucher_number', 'contact_id', 'voucher_date',
+        'amount', 'payment_mode', 'reference_number', 'notes', 'created_by',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'voucher_date' => 'date',
+            'amount' => 'decimal:2',
+            'payment_mode' => PaymentMode::class,
+        ];
+    }
+
+    public function contact(): BelongsTo { return $this->belongsTo(Contact::class); }
+    public function allocations(): HasMany { return $this->hasMany(PaymentVoucherAllocation::class); }
+    public function creator(): BelongsTo { return $this->belongsTo(User::class, 'created_by'); }
+}
