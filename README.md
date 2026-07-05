@@ -33,7 +33,7 @@ Because this project is public but restricted, please note the following before 
 
 1. **Clone the repository**
    ```bash
-   git clone git@github.com:hyperlink-developer/cratory.git
+   git clone git@github.com:TheLateNightArtisan/cratory.git
    cd cratory
    ```
 
@@ -87,7 +87,7 @@ APP_DEBUG=false
 
 ## 📝 License & Copyright
 
-**Copyright (c) 2026 hyperlink-developer. All Rights Reserved.**
+**Copyright (c) 2026 TheLateNightArtisan (Yagnesh Bhanani). All Rights Reserved.**
 
 This project is licensed under a strict **Non-Commercial** model. Permission is granted exclusively to view, fork, and test this software for personal, educational, and non-commercial exploration.
 
