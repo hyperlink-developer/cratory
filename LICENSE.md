@@ -1,4 +1,4 @@
-Copyright (c) 2026 Yagnesh Bhanani
+Copyright (c) 2026 Yagnesh Bhanani (TheLateNightArtisan)
 
 This work is licensed under the Creative Commons Attribution-NonCommercial 4.0 
 International License. To view a copy of this license, visit 
