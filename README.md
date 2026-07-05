@@ -15,7 +15,7 @@ Cratory is a modern, responsive, and fully-featured Invoicing and Finance Manage
 
 ## 🛠 Tech Stack
 
-- **Backend:** Laravel 11.x, PHP 8.2+
+- **Backend:** Laravel 13.x, PHP 8.5+
 - **Frontend:** Livewire 3, Alpine.js, Tailwind CSS
 - **PDF Generation:** Barryvdh/laravel-dompdf
 - **Database:** MySQL / SQLite
