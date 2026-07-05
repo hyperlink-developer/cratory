@@ -13,7 +13,20 @@
     </div>
 
     <!-- KPIs -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
+        <div class="glass-card p-5 relative overflow-hidden group">
+            <div class="absolute inset-0 bg-gradient-to-br from-indigo-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-medium text-text-secondary">Net Profit ({{ ucfirst($period) }})</h3>
+                <div class="w-8 h-8 rounded-full bg-indigo-400/10 flex items-center justify-center text-indigo-400">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M3 14h18" />
+                    </svg>
+                </div>
+            </div>
+            <p class="text-2xl font-bold {{ $kpis['net_profit'] >= 0 ? 'text-green-400' : 'text-red-400' }}">₹{{ number_format($kpis['net_profit'], 2) }}</p>
+        </div>
         <div class="glass-card p-5 relative overflow-hidden group">
             <div class="absolute inset-0 bg-gradient-to-br from-green-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             <div class="flex items-center justify-between mb-4">
@@ -65,6 +78,69 @@
             </div>
             <p class="text-2xl font-bold text-text-primary">₹{{ number_format($kpis['total_payable'], 2) }}</p>
         </div>
+    </div>
+
+    <div class="glass-card p-5 mb-6">
+        <h2 class="text-base font-semibold text-text-primary mb-4">Revenue vs Expenses (Last 6 Months)</h2>
+        <div id="chart" 
+             x-data="{ 
+                init() {
+                    let options = {
+                        series: [{
+                            name: 'Sales',
+                            data: {{ json_encode($chartData['sales']) }}
+                        }, {
+                            name: 'Purchases',
+                            data: {{ json_encode($chartData['purchases']) }}
+                        }],
+                        chart: {
+                            type: 'area',
+                            height: 300,
+                            toolbar: { show: false },
+                            background: 'transparent'
+                        },
+                        colors: ['#4ade80', '#fb923c'],
+                        fill: {
+                            type: 'gradient',
+                            gradient: {
+                                shadeIntensity: 1,
+                                opacityFrom: 0.4,
+                                opacityTo: 0.05,
+                                stops: [0, 90, 100]
+                            }
+                        },
+                        dataLabels: { enabled: false },
+                        stroke: { curve: 'smooth', width: 2 },
+                        xaxis: {
+                            categories: {!! json_encode($chartData['categories']) !!},
+                            axisBorder: { show: false },
+                            axisTicks: { show: false },
+                            labels: {
+                                style: { colors: '#94a3b8' }
+                            }
+                        },
+                        yaxis: {
+                            labels: {
+                                style: { colors: '#94a3b8' },
+                                formatter: function (val) {
+                                    return '₹' + val.toLocaleString();
+                                }
+                            }
+                        },
+                        grid: {
+                            borderColor: 'rgba(255,255,255,0.05)',
+                            strokeDashArray: 4,
+                        },
+                        theme: { mode: 'dark' },
+                        legend: { position: 'top', horizontalAlign: 'right' },
+                        tooltip: { theme: 'dark' }
+                    };
+
+                    let chart = new ApexCharts(this.$el, options);
+                    chart.render();
+                }
+             }"
+        ></div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">

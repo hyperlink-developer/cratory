@@ -157,7 +157,19 @@
                     @endif
                 </td>
                 <td class="invoice-meta" style="width: 50%;">
-                    <div class="title">{{ strtoupper($invoice->invoice_type->value) }} INVOICE</div>
+                    @php
+                        $title = strtoupper($invoice->invoice_type->value) . ' INVOICE';
+                        if ($organization->gst_number) {
+                            if ($organization->is_composition_tax_payer) {
+                                $title = 'BILL OF SUPPLY';
+                            } else {
+                                $title = $invoice->invoice_type->value === 'sales' ? 'TAX INVOICE' : 'SERVICE INVOICE';
+                            }
+                        } else {
+                            $title = 'INVOICE';
+                        }
+                    @endphp
+                    <div class="title">{{ $title }}</div>
                     <p><strong>Invoice No:</strong> {{ $invoice->invoice_number ?? 'DRAFT' }}</p>
                     <p><strong>Date:</strong> {{ $invoice->invoice_date?->format('d M, Y') }}</p>
                     <p><strong>Due Date:</strong> {{ $invoice->due_date?->format('d M, Y') }}</p>
@@ -182,7 +194,7 @@
                     @endif
                 </td>
                 <td class="contact-details">
-                    @if($template->show_fields['shipping_address'] ?? true)
+                    @if(isset($template->show_fields['shipping_address']) ? $template->show_fields['shipping_address'] : true)
                     <h3>Shipped To</h3>
                     <p style="font-weight: bold; font-size: 14px; color: #333;">{{ $contact->name }}</p>
                     <p>{{ $contact->shipping_address_line_1 }} {{ $contact->shipping_address_line_2 }}</p>
@@ -205,7 +217,7 @@
                 @endif
                 <th class="text-center">Qty</th>
                 <th class="text-right">Rate</th>
-                @if($template->show_fields['tax_details'] ?? true)
+                @if((isset($template->show_fields['tax']) ? $template->show_fields['tax'] : true) && (!$organization->gst_number || !$organization->is_composition_tax_payer))
                     <th class="text-right">Tax</th>
                 @endif
                 <th class="text-right">Amount</th>
@@ -220,14 +232,14 @@
                         <br><span style="color: #666; font-size: 11px;">{{ $item->description }}</span>
                     @endif
                 </td>
-                @if($invoice->invoice_type->value === 'sales' && ($template->show_fields['hsn'] ?? true))
-                    <td class="text-center">{{ $item->product?->hsn_code ?? '-' }}</td>
-                @elseif($invoice->invoice_type->value === 'service' && ($template->show_fields['hsn'] ?? true))
-                    <td class="text-center">{{ $item->product?->sac_code ?? '-' }}</td>
+                @if($invoice->invoice_type->value === 'sales' && (isset($template->show_fields['hsn']) ? $template->show_fields['hsn'] : true))
+                    <td class="text-center">{{ $item->hsn_code ?? '-' }}</td>
+                @elseif($invoice->invoice_type->value === 'service' && (isset($template->show_fields['hsn']) ? $template->show_fields['hsn'] : true))
+                    <td class="text-center">{{ $item->hsn_code ?? '-' }}</td>
                 @endif
                 <td class="text-center">{{ $item->quantity + 0 }} {{ $item->unit }}</td>
                 <td class="text-right">{{ number_format($item->rate, 2) }}</td>
-                @if($template->show_fields['tax_details'] ?? true)
+                @if((isset($template->show_fields['tax']) ? $template->show_fields['tax'] : true) && (!$organization->gst_number || !$organization->is_composition_tax_payer))
                 <td class="text-right">
                     @if($item->tax_amount > 0)
                         {{ number_format($item->tax_amount, 2) }}

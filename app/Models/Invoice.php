@@ -18,6 +18,7 @@ class Invoice extends Model
 
     protected $fillable = [
         'organization_id',
+        'invoice_basis',
         'invoice_type',
         'invoice_number',
         'contact_id',
@@ -41,6 +42,7 @@ class Invoice extends Model
     protected function casts(): array
     {
         return [
+            'invoice_basis' => \App\Enums\InvoiceBasis::class,
             'invoice_type' => InvoiceType::class,
             'status' => InvoiceStatus::class,
             'invoice_date' => 'date',

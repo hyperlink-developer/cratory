@@ -16,7 +16,7 @@ class PurchaseInvoice extends Model
     use BelongsToOrganization, HasUuid, SoftDeletes;
 
     protected $fillable = [
-        'organization_id', 'purchase_number', 'vendor_bill_number',
+        'organization_id', 'invoice_basis', 'purchase_number', 'vendor_bill_number',
         'contact_id', 'purchase_date', 'due_date',
         'subtotal', 'discount_total', 'tax_total', 'round_off', 'grand_total',
         'amount_paid', 'balance_due', 'status', 'attachment_path', 'created_by',
@@ -25,6 +25,7 @@ class PurchaseInvoice extends Model
     protected function casts(): array
     {
         return [
+            'invoice_basis' => \App\Enums\InvoiceBasis::class,
             'status' => PurchaseStatus::class,
             'purchase_date' => 'date',
             'due_date' => 'date',

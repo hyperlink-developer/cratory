@@ -13,6 +13,7 @@ use Livewire\Component;
 class PurchaseForm extends Component
 {
     public ?PurchaseInvoice $purchase = null;
+    public string $invoiceBasis = 'credit'; // cash or credit
     
     // Header Info
     public ?int $contactId = null;
@@ -51,8 +52,9 @@ class PurchaseForm extends Component
 
         if ($purchase && $purchase->exists) {
             $this->purchase = $purchase;
+            $this->invoiceBasis = $purchase->invoice_basis->value ?? 'credit';
             $this->contactId = $purchase->contact_id;
-            $this->billNumber = $purchase->bill_number ?? '';
+            $this->billNumber = $purchase->vendor_bill_number ?? '';
             $this->billDate = $purchase->purchase_date?->format('Y-m-d') ?? '';
             $this->dueDate = $purchase->due_date?->format('Y-m-d') ?? '';
             
@@ -79,8 +81,9 @@ class PurchaseForm extends Component
     public function addItem()
     {
         $this->items[] = [
-            'product_id' => null,
+            'product_id' => '',
             'description' => '',
+            'hsn_code' => '',
             'quantity' => 1,
             'unit' => 'pcs',
             'rate' => 0.00,
@@ -105,12 +108,13 @@ class PurchaseForm extends Component
             $productId = $this->items[$index]['product_id'];
             
             if ($productId) {
-                $product = collect($this->products)->firstWhere('id', $productId);
+                $product = Product::find($productId);
                 if ($product) {
-                    $this->items[$index]['description'] = $product['description'] ?? '';
-                    $this->items[$index]['rate'] = $product['purchase_price'];
-                    $this->items[$index]['unit'] = $product['unit'] ?? 'pcs';
-                    $this->items[$index]['tax_rate_id'] = $product['tax_rate_id'];
+                    $this->items[$index]['description'] = $product->description;
+                    $this->items[$index]['hsn_code'] = $product->hsn_code ?? $product->sac_code;
+                    $this->items[$index]['rate'] = $product->purchase_price;
+                    $this->items[$index]['unit'] = $product->unit ?? 'pcs';
+                    $this->items[$index]['tax_rate_id'] = $product->tax_rate_id;
                 }
             }
         }
@@ -199,9 +203,14 @@ class PurchaseForm extends Component
             'contactId' => 'required|exists:contacts,id',
             'billNumber' => 'required|string|max:100',
             'billDate' => 'required|date',
-            'dueDate' => 'required|date',
+            'dueDate' => $this->invoiceBasis === 'cash' ? 'nullable|date' : 'required|date',
+            'invoiceBasis' => 'required|in:cash,credit',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
+            'items.*.hsn_code' => [
+                auth()->user()->currentOrganization->gst_number ? 'required' : 'nullable',
+                'string', 'max:15'
+            ],
             'items.*.quantity' => 'required|numeric|min:0.01',
             'items.*.rate' => 'required|numeric|min:0',
         ], [
@@ -218,8 +227,9 @@ class PurchaseForm extends Component
             $status = $statusAction === 'receive' ? PurchaseStatus::Received : PurchaseStatus::Draft;
 
             $data = [
+                'invoice_basis' => $this->invoiceBasis,
                 'contact_id' => $this->contactId,
-                'bill_number' => $this->billNumber,
+                'vendor_bill_number' => $this->billNumber,
                 'purchase_date' => $this->billDate,
                 'due_date' => $this->dueDate,
                 'subtotal' => $this->subtotal,
@@ -228,7 +238,14 @@ class PurchaseForm extends Component
                 'round_off' => $this->roundOff,
                 'grand_total' => $this->grandTotal,
                 'balance_due' => $this->grandTotal,
+                'amount_paid' => 0,
             ];
+
+            if ($this->invoiceBasis === 'cash' && $statusAction === 'receive') {
+                $status = PurchaseStatus::Paid;
+                $data['amount_paid'] = $this->grandTotal;
+                $data['balance_due'] = 0;
+            }
 
             if ($isNew) {
                 $data['organization_id'] = $organization->id;
@@ -238,7 +255,7 @@ class PurchaseForm extends Component
                 $this->purchase = PurchaseInvoice::create($data);
             } else {
                 if ($this->purchase->status->value === 'draft' && $statusAction === 'receive') {
-                    $data['status'] = PurchaseStatus::Received;
+                    $data['status'] = $this->invoiceBasis === 'cash' ? PurchaseStatus::Paid : PurchaseStatus::Received;
                 }
                 $this->purchase->update($data);
                 $this->purchase->items()->delete();
@@ -248,6 +265,7 @@ class PurchaseForm extends Component
                 $this->purchase->items()->create([
                     'product_id' => $item['product_id'],
                     'description' => $item['description'],
+                    'hsn_code' => $item['hsn_code'] ?? null,
                     'quantity' => $item['quantity'],
                     'unit' => $item['unit'],
                     'rate' => $item['rate'],
@@ -266,15 +284,19 @@ class PurchaseForm extends Component
                         $item->product->stockMovements()->create([
                             'organization_id' => $organization->id,
                             'product_id' => $item->product_id,
-                            'type' => 'in',
+                            'type' => \App\Enums\StockMovementType::PurchaseIn,
                             'quantity' => $item->quantity,
-                            'notes' => 'Purchase Bill #' . $this->purchase->bill_number,
+                            'balance_after' => $item->product->current_stock + $item->quantity,
+                            'notes' => 'Purchase Bill #' . $this->purchase->vendor_bill_number,
                             'created_by' => auth()->id(),
                         ]);
                         $item->product->increment('current_stock', $item->quantity);
                     }
                 }
             }
+            
+            // Post to ledger
+            app(\App\Services\LedgerService::class)->postPurchase($this->purchase);
         });
 
         $this->redirect(route('purchases.index'), navigate: true);

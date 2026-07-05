@@ -82,6 +82,18 @@
                 @error('gstNumber') <p class="mt-1.5 text-xs text-red-400">{{ $message }}</p> @enderror
                 <p class="mt-1 text-xs text-text-muted">Leave blank if not GST registered</p>
             </div>
+
+            @if($gstNumber)
+            <div class="p-4 rounded-xl border border-white/10 bg-surface-lighter">
+                <label class="flex items-center gap-3 cursor-pointer">
+                    <input wire:model="isComposition" type="checkbox" class="w-5 h-5 rounded border-white/20 bg-transparent text-primary focus:ring-primary focus:ring-offset-surface">
+                    <div class="flex flex-col">
+                        <span class="text-sm font-medium text-text-primary">Composition Tax Payer</span>
+                        <span class="text-xs text-text-muted mt-0.5">Check this if your business is registered under the GST Composition Scheme</span>
+                    </div>
+                </label>
+            </div>
+            @endif
         </div>
 
         {{-- Step 3: Address --}}
@@ -171,7 +183,10 @@
                 @if($gstNumber)
                 <div class="flex justify-between items-start py-2.5 border-b border-white/5">
                     <span class="text-sm text-text-muted">GSTIN</span>
-                    <span class="text-sm text-text-primary font-mono">{{ strtoupper($gstNumber) }}</span>
+                    <span class="text-sm text-text-primary font-mono text-right">
+                        {{ strtoupper($gstNumber) }}
+                        @if($isComposition) <br><span class="text-xs text-accent bg-accent/10 px-2 py-0.5 rounded-full inline-block mt-1">Composition Scheme</span> @endif
+                    </span>
                 </div>
                 @endif
                 <div class="flex justify-between items-start py-2.5 border-b border-white/5">

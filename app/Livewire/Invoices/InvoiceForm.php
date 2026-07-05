@@ -17,6 +17,7 @@ class InvoiceForm extends Component
     public ?Invoice $invoice = null;
     
     public string $type = 'sales'; // sales or service
+    public string $invoiceBasis = 'credit'; // cash or credit
     
     // Header Info
     public ?int $contactId = null;
@@ -68,6 +69,7 @@ class InvoiceForm extends Component
         if ($invoice && $invoice->exists) {
             $this->invoice = $invoice;
             $this->type = $invoice->invoice_type->value;
+            $this->invoiceBasis = $invoice->invoice_basis->value ?? 'credit';
             $this->contactId = $invoice->contact_id;
             $this->invoiceNumber = $invoice->invoice_number ?? '';
             $this->invoiceDate = $invoice->invoice_date?->format('Y-m-d') ?? '';
@@ -101,6 +103,7 @@ class InvoiceForm extends Component
             'product_id' => null,
             'item_name' => '',
             'description' => '',
+            'hsn_code' => '',
             'quantity' => 1,
             'unit' => 'pcs',
             'rate' => 0.00,
@@ -127,7 +130,9 @@ class InvoiceForm extends Component
             if ($productId) {
                 $product = collect($this->products)->firstWhere('id', $productId);
                 if ($product) {
+                    $this->items[$index]['item_name'] = $product['name'];
                     $this->items[$index]['description'] = $product['description'] ?? '';
+                    $this->items[$index]['hsn_code'] = $product['hsn_code'] ?? $product['sac_code'] ?? '';
                     $this->items[$index]['rate'] = $product['selling_price'];
                     $this->items[$index]['unit'] = $product['unit'] ?? 'pcs';
                     $this->items[$index]['tax_rate_id'] = $product['tax_rate_id'];
@@ -225,10 +230,16 @@ class InvoiceForm extends Component
             'contactId' => 'required|exists:contacts,id',
             'invoiceNumber' => 'nullable|string|max:255',
             'invoiceDate' => 'required|date',
-            'dueDate' => 'required|date',
+            'dueDate' => $this->invoiceBasis === 'cash' ? 'nullable|date' : 'required|date',
+            'invoiceBasis' => 'required|in:cash,credit',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'nullable|exists:products,id',
             'items.*.item_name' => 'required_without:items.*.product_id|string|max:255',
+            'items.*.description' => 'nullable|string|max:1000',
+            'items.*.hsn_code' => [
+                auth()->user()->currentOrganization->gst_number ? 'required' : 'nullable',
+                'string', 'max:15'
+            ],
             'items.*.quantity' => 'required|numeric|min:0.01',
             'items.*.rate' => 'required|numeric|min:0',
         ], [
@@ -248,6 +259,7 @@ class InvoiceForm extends Component
             $status = $statusAction === 'send' ? InvoiceStatus::Sent : InvoiceStatus::Draft;
 
             $data = [
+                'invoice_basis' => $this->invoiceBasis,
                 'invoice_type' => $this->type,
                 'contact_id' => $this->contactId,
                 'invoice_date' => $this->invoiceDate,
@@ -258,7 +270,14 @@ class InvoiceForm extends Component
                 'round_off' => $this->roundOff,
                 'grand_total' => $this->grandTotal,
                 'balance_due' => $this->grandTotal, // Since no payment yet
+                'amount_paid' => 0,
             ];
+
+            if ($this->invoiceBasis === 'cash' && $statusAction === 'send') {
+                $status = InvoiceStatus::Paid;
+                $data['amount_paid'] = $this->grandTotal;
+                $data['balance_due'] = 0;
+            }
 
             if ($isNew) {
                 $data['organization_id'] = $organization->id;
@@ -269,7 +288,7 @@ class InvoiceForm extends Component
                 $this->invoice = Invoice::create($data);
             } else {
                 if ($this->invoice->status->value === 'draft' && $statusAction === 'send') {
-                    $data['status'] = InvoiceStatus::Sent;
+                    $data['status'] = $this->invoiceBasis === 'cash' ? InvoiceStatus::Paid : InvoiceStatus::Sent;
                 }
                 if ($this->invoiceNumber) {
                     $data['invoice_number'] = $this->invoiceNumber;
@@ -283,7 +302,8 @@ class InvoiceForm extends Component
                 $this->invoice->items()->create([
                     'product_id' => $item['product_id'] ?: null,
                     'item_name' => $item['item_name'] ?? null,
-                    'description' => $item['description'],
+                    'description' => $item['description'] ?? null,
+                    'hsn_code' => $item['hsn_code'] ?? null,
                     'quantity' => $item['quantity'],
                     'unit' => $item['unit'],
                     'rate' => $item['rate'],
@@ -303,8 +323,9 @@ class InvoiceForm extends Component
                         $item->product->stockMovements()->create([
                             'organization_id' => $organization->id,
                             'product_id' => $item->product_id,
-                            'type' => 'out',
+                            'type' => \App\Enums\StockMovementType::SaleOut,
                             'quantity' => $item->quantity,
+                            'balance_after' => $item->product->current_stock - $item->quantity,
                             'notes' => 'Sales Invoice #' . $this->invoice->invoice_number,
                             'created_by' => auth()->id(),
                         ]);
@@ -312,6 +333,9 @@ class InvoiceForm extends Component
                     }
                 }
             }
+            
+            // Post to ledger
+            app(\App\Services\LedgerService::class)->postInvoice($this->invoice);
         });
 
         $this->redirect(route('invoices.index'), navigate: true);

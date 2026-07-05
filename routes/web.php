@@ -64,6 +64,26 @@ Route::middleware(['auth', SetCurrentOrganization::class])->group(function () {
         Route::get('/vouchers', \App\Livewire\Finance\VoucherList::class)->name('vouchers.index');
         Route::get('/vouchers/create', \App\Livewire\Finance\VoucherForm::class)->name('vouchers.create');
 
+        // Accounting
+        Route::get('/accounting/chart-of-accounts', \App\Livewire\Accounting\ChartOfAccounts::class)->name('accounting.chart-of-accounts');
+        Route::get('/accounting/manual-journal', \App\Livewire\Accounting\ManualJournal::class)->name('accounting.manual-journal');
+
+        // Reports
+        Route::get('/reports/sales', \App\Livewire\Reports\SaleReport::class)->name('reports.sales');
+        Route::get('/reports/purchases', \App\Livewire\Reports\PurchaseReport::class)->name('reports.purchases');
+        Route::get('/reports/profit-loss', \App\Livewire\Reports\ProfitLossReport::class)->name('reports.profit-loss');
+        Route::get('/reports/trial-balance', \App\Livewire\Reports\TrialBalance::class)->name('reports.trial-balance');
+        Route::get('/reports/balance-sheet', \App\Livewire\Reports\BalanceSheet::class)->name('reports.balance-sheet');
+        
+        // Report Exports
+        Route::get('/reports/sales/export/pdf', [\App\Http\Controllers\ReportExportController::class, 'exportSalesPdf'])->name('reports.sales.pdf');
+        Route::get('/reports/sales/export/csv', [\App\Http\Controllers\ReportExportController::class, 'exportSalesCsv'])->name('reports.sales.csv');
+        Route::get('/reports/purchases/export/pdf', [\App\Http\Controllers\ReportExportController::class, 'exportPurchasesPdf'])->name('reports.purchases.pdf');
+        Route::get('/reports/purchases/export/csv', [\App\Http\Controllers\ReportExportController::class, 'exportPurchasesCsv'])->name('reports.purchases.csv');
+        Route::get('/reports/profit-loss/export/pdf', [\App\Http\Controllers\ReportExportController::class, 'exportProfitLossPdf'])->name('reports.profit-loss.pdf');
+        Route::get('/reports/trial-balance/export/pdf', [\App\Http\Controllers\ReportExportController::class, 'exportTrialBalancePdf'])->name('reports.trial-balance.pdf');
+        Route::get('/reports/balance-sheet/export/pdf', [\App\Http\Controllers\ReportExportController::class, 'exportBalanceSheetPdf'])->name('reports.balance-sheet.pdf');
+
         // Settings
         Route::get('/settings/tax-rates', \App\Livewire\Settings\TaxRates::class)->name('settings.tax-rates');
         Route::get('/settings/invoice-templates', \App\Livewire\Settings\InvoiceTemplates::class)->name('settings.invoice-templates');

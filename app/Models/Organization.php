@@ -35,6 +35,7 @@ class Organization extends Model
         'currency',
         'created_by',
         'is_active',
+        'is_composition_tax_payer',
     ];
 
     protected function casts(): array
@@ -43,6 +44,7 @@ class Organization extends Model
             'type' => OrganizationType::class,
             'business_category' => BusinessCategory::class,
             'is_active' => 'boolean',
+            'is_composition_tax_payer' => 'boolean',
             'financial_year_start_month' => 'integer',
         ];
     }

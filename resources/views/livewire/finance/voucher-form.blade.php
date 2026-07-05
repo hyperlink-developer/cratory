@@ -112,8 +112,8 @@
                             <tbody class="divide-y divide-white/5">
                                 @foreach($openBills as $bill)
                                     <tr class="hover:bg-white/5">
-                                        <td class="px-4 py-3 font-medium text-text-primary">{{ $bill->bill_number }}</td>
-                                        <td class="px-4 py-3 text-text-muted">{{ $bill->bill_date->format('d M Y') }}</td>
+                                        <td class="px-4 py-3 font-medium text-text-primary">{{ $bill->vendor_bill_number }}</td>
+                                        <td class="px-4 py-3 text-text-muted">{{ $bill->purchase_date ? $bill->purchase_date->format('d M Y') : '-' }}</td>
                                         <td class="px-4 py-3 text-right">₹{{ number_format($bill->grand_total, 2) }}</td>
                                         <td class="px-4 py-3 text-right font-medium text-red-400">₹{{ number_format($bill->balance_due, 2) }}</td>
                                         <td class="px-4 py-3 text-right">
