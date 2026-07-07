@@ -69,20 +69,20 @@
                     <div>
                         <label class="form-label">Primary Color</label>
                         <div class="flex items-center gap-2">
-                            <input type="color" wire:model="colorPrimary" class="w-10 h-10 rounded cursor-pointer bg-transparent border-0 p-0">
-                            <input type="text" wire:model="colorPrimary" class="form-input flex-1 uppercase text-sm">
+                            <input type="color" wire:model.live="colorPrimary" class="w-10 h-10 rounded cursor-pointer bg-transparent border-0 p-0">
+                            <input type="text" wire:model.live="colorPrimary" class="form-input flex-1 uppercase text-sm">
                         </div>
                     </div>
                     <div>
                         <label class="form-label">Secondary Color</label>
                         <div class="flex items-center gap-2">
-                            <input type="color" wire:model="colorSecondary" class="w-10 h-10 rounded cursor-pointer bg-transparent border-0 p-0">
-                            <input type="text" wire:model="colorSecondary" class="form-input flex-1 uppercase text-sm">
+                            <input type="color" wire:model.live="colorSecondary" class="w-10 h-10 rounded cursor-pointer bg-transparent border-0 p-0">
+                            <input type="text" wire:model.live="colorSecondary" class="form-input flex-1 uppercase text-sm">
                         </div>
                     </div>
                     <div>
                         <label class="form-label">Font Family</label>
-                        <select wire:model="fontChoice" class="form-input">
+                        <select wire:model.live="fontChoice" class="form-input">
                             <option value="Helvetica">Helvetica (Standard)</option>
                             <option value="Times-Roman">Times Roman (Serif)</option>
                             <option value="Courier">Courier (Monospace)</option>
@@ -95,17 +95,30 @@
                 <h3 class="text-lg font-semibold text-text-primary mb-4">Visible Fields</h3>
                 <div class="space-y-3">
                     <label class="flex items-center gap-3 cursor-pointer">
-                        <input type="checkbox" wire:model="showFields.shipping_address" class="w-4 h-4 rounded border-white/20 bg-surface/50 text-accent focus:ring-accent focus:ring-offset-surface">
+                        <input type="checkbox" wire:model.live="showFields.shipping_address" class="w-4 h-4 rounded border-white/20 bg-surface/50 text-accent focus:ring-accent focus:ring-offset-surface">
                         <span class="text-sm text-text-secondary">Shipping Address</span>
                     </label>
                     <label class="flex items-center gap-3 cursor-pointer">
-                        <input type="checkbox" wire:model="showFields.hsn" class="w-4 h-4 rounded border-white/20 bg-surface/50 text-accent focus:ring-accent focus:ring-offset-surface">
+                        <input type="checkbox" wire:model.live="showFields.hsn" class="w-4 h-4 rounded border-white/20 bg-surface/50 text-accent focus:ring-accent focus:ring-offset-surface">
                         <span class="text-sm text-text-secondary">HSN / SAC Codes</span>
                     </label>
                     <label class="flex items-center gap-3 cursor-pointer">
-                        <input type="checkbox" wire:model="showFields.tax_details" class="w-4 h-4 rounded border-white/20 bg-surface/50 text-accent focus:ring-accent focus:ring-offset-surface">
+                        <input type="checkbox" wire:model.live="showFields.tax_details" class="w-4 h-4 rounded border-white/20 bg-surface/50 text-accent focus:ring-accent focus:ring-offset-surface">
                         <span class="text-sm text-text-secondary">Tax Details Column</span>
                     </label>
+                </div>
+            </div>
+            <div class="glass-card p-6">
+                <h3 class="text-lg font-semibold text-text-primary mb-4">Default Text</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="form-label">Payment Information / Notes</label>
+                        <textarea wire:model.defer="defaultPaymentInfo" class="form-input min-h-[80px] resize-y" placeholder="Bank account details, UPI ID..."></textarea>
+                    </div>
+                    <div>
+                        <label class="form-label">Terms & Conditions</label>
+                        <textarea wire:model.defer="defaultTermsAndConditions" class="form-input min-h-[80px] resize-y" placeholder="Warranty details, payment terms..."></textarea>
+                    </div>
                 </div>
             </div>
 
@@ -114,21 +127,10 @@
 
         <!-- Preview Area -->
         <div class="lg:col-span-2">
-            <div class="glass-card p-1 min-h-[600px] flex flex-col items-center justify-center bg-surface-lighter/50">
-                <div class="text-center p-6">
-                    <div class="w-16 h-16 mx-auto mb-4 bg-accent/20 rounded-full flex items-center justify-center text-accent">
-                        <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-medium text-text-primary mb-2">Live Preview Unavailable</h3>
-                    <p class="text-sm text-text-muted max-w-md mx-auto">
-                        To see exactly how this template looks with your real data, save your settings and download a PDF of one of your existing invoices.
-                    </p>
-                    <div class="mt-6">
-                        <a href="{{ route('invoices.index') }}" class="btn btn-outline" wire:navigate>Go to Invoices</a>
-                    </div>
-                </div>
+            <div class="glass-card overflow-hidden bg-white border border-white/10 relative shadow-2xl" style="height: 800px;">
+                <!-- A thin overlay to indicate it's a preview on dark mode backgrounds -->
+                <div class="absolute inset-0 pointer-events-none ring-1 ring-inset ring-black/10"></div>
+                <iframe srcdoc="{{ $this->getPreviewHtml() }}" class="w-full h-full border-0" title="Invoice Preview"></iframe>
             </div>
         </div>
     </div>

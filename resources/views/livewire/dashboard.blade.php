@@ -80,6 +80,11 @@
         </div>
     </div>
 
+    @php
+        $hasChartData = array_sum($chartData['sales']) > 0 || array_sum($chartData['purchases']) > 0;
+    @endphp
+
+    @if($hasChartData)
     <div class="glass-card p-5 mb-6">
         <h2 class="text-base font-semibold text-text-primary mb-4">Revenue vs Expenses (Last 6 Months)</h2>
         <div id="chart" 
@@ -112,7 +117,7 @@
                         dataLabels: { enabled: false },
                         stroke: { curve: 'smooth', width: 2 },
                         xaxis: {
-                            categories: {!! json_encode($chartData['categories']) !!},
+                            categories: {{ json_encode($chartData['categories']) }},
                             axisBorder: { show: false },
                             axisTicks: { show: false },
                             labels: {
@@ -136,12 +141,18 @@
                         tooltip: { theme: 'dark' }
                     };
 
-                    let chart = new ApexCharts(this.$el, options);
-                    chart.render();
+                    try {
+                        let chart = new ApexCharts(this.$el, options);
+                        chart.render();
+                    } catch (error) {
+                        console.error('ApexCharts Error:', error);
+                        if(window.Toast) { window.Toast.fire({icon: 'error', title: 'Chart Error: ' + error.message}); }
+                    }
                 }
              }"
         ></div>
     </div>
+    @endif
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Recent Activity Feed -->

@@ -49,8 +49,8 @@ class ProductForm extends Component
             $this->hsnCode = $product->hsn_code ?? '';
             $this->sacCode = $product->sac_code ?? '';
             
-            $this->sellingPrice = $product->selling_price;
-            $this->purchasePrice = $product->purchase_price;
+            $this->sellingPrice = $product->selling_price ?? '0.00';
+            $this->purchasePrice = $product->purchase_price ?? '0.00';
             $this->taxRateId = $product->tax_rate_id;
             
             $this->openingStock = $product->opening_stock ?? '0.00';
@@ -70,10 +70,10 @@ class ProductForm extends Component
             
             'sellingPrice' => 'required|numeric|min:0',
             'purchasePrice' => 'required|numeric|min:0',
+            'unit' => 'nullable|string|max:50',
         ];
 
         if ($this->itemType === 'product') {
-            $rules['unit'] = 'nullable|string|max:50';
             $rules['hsnCode'] = 'nullable|string|max:50';
             $rules['openingStock'] = 'required|numeric|min:0';
             $rules['reorderLevel'] = 'nullable|numeric|min:0';
@@ -113,10 +113,10 @@ class ProductForm extends Component
             'selling_price' => $this->sellingPrice,
             'purchase_price' => $this->purchasePrice,
             'tax_rate_id' => $this->taxRateId,
+            'unit' => $this->unit ?: ($this->itemType === 'product' ? 'pcs' : 'hrs'),
         ];
 
         if ($this->itemType === 'product') {
-            $data['unit'] = $this->unit ?: 'pcs';
             $data['hsn_code'] = $this->hsnCode ?: null;
             $data['sac_code'] = null; // Clear SAC for products
             $data['opening_stock'] = $this->openingStock;
@@ -128,7 +128,6 @@ class ProductForm extends Component
             }
         } else {
             // Service specific clears
-            $data['unit'] = null;
             $data['hsn_code'] = null;
             $data['sac_code'] = $this->sacCode ?: null;
             $data['opening_stock'] = 0;

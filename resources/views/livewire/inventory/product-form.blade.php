@@ -51,20 +51,16 @@
                                 @error('sku') <p class="mt-1.5 text-xs text-red-400">{{ $message }}</p> @enderror
                             </div>
                             
-                            @if($itemType === 'product')
                             <div>
                                 <label class="form-label">Unit of Measurement</label>
                                 <select wire:model="unit" class="form-input cursor-pointer">
+                                    <option value="nos">Numbers (nos)</option>
+                                    <option value="mts">Meters (mts)</option>
                                     <option value="pcs">Pieces (pcs)</option>
-                                    <option value="kg">Kilograms (kg)</option>
-                                    <option value="g">Grams (g)</option>
-                                    <option value="l">Liters (l)</option>
-                                    <option value="m">Meters (m)</option>
-                                    <option value="box">Boxes (box)</option>
+                                    <option value="hrs">Hours (hrs)</option>
                                 </select>
                                 @error('unit') <p class="mt-1.5 text-xs text-red-400">{{ $message }}</p> @enderror
                             </div>
-                            @endif
                         </div>
 
                         <div>

@@ -23,10 +23,10 @@ class Dashboard extends Component
     private function getPeriodDates(): array
     {
         return match ($this->period) {
-            'week' => [Carbon::now()->startOfWeek(), Carbon::now()],
-            'month' => [Carbon::now()->startOfMonth(), Carbon::now()],
-            'quarter' => [Carbon::now()->startOfQuarter(), Carbon::now()],
-            'year' => [Carbon::now()->startOfYear(), Carbon::now()],
+            'week' => [Carbon::now()->subDays(7), Carbon::now()],
+            'month' => [Carbon::now()->subDays(30), Carbon::now()],
+            'quarter' => [Carbon::now()->subDays(90), Carbon::now()],
+            'year' => [Carbon::now()->subDays(365), Carbon::now()],
             default => [Carbon::now()->startOfMonth(), Carbon::now()],
         };
     }
@@ -43,18 +43,27 @@ class Dashboard extends Component
             ->whereNotIn('status', ['draft', 'cancelled'])
             ->sum('grand_total');
 
+        // Subtract unallocated receipts from total receivable (advances)
+        $totalAllocatedReceipts = \App\Models\ReceiptAllocation::sum('allocated_amount');
+        $unallocatedReceipts = Receipt::sum('amount') - $totalAllocatedReceipts;
+        
         $totalReceivable = Invoice::whereNotIn('status', ['draft', 'cancelled', 'paid'])
-            ->sum('balance_due');
+            ->sum('balance_due') - $unallocatedReceipts;
+
+        // Subtract unallocated vouchers from total payable (advances given)
+        $totalAllocatedVouchers = \App\Models\PaymentVoucherAllocation::sum('allocated_amount');
+        $unallocatedVouchers = PurchaseInvoice::sum('amount_paid') - $totalAllocatedVouchers; // wait, is it VoucherAllocation?
+        $unallocatedVouchers = \App\Models\PaymentVoucher::sum('amount') - $totalAllocatedVouchers;
 
         $totalPayable = PurchaseInvoice::whereNotIn('status', ['draft', 'cancelled', 'paid'])
-            ->sum('balance_due');
+            ->sum('balance_due') - $unallocatedVouchers;
 
         return [
             'total_sales' => $totalSales,
             'total_purchases' => $totalPurchases,
             'net_profit' => $totalSales - $totalPurchases,
-            'total_receivable' => $totalReceivable,
-            'total_payable' => $totalPayable,
+            'total_receivable' => max(0, $totalReceivable),
+            'total_payable' => max(0, $totalPayable),
         ];
     }
 
@@ -127,11 +136,11 @@ class Dashboard extends Component
             
             $months[] = $monthStart->format('M Y');
             
-            $salesData[] = Invoice::whereBetween('invoice_date', [$monthStart, $monthEnd])
+            $salesData[] = (float) Invoice::whereBetween('invoice_date', [$monthStart, $monthEnd])
                 ->whereNotIn('status', ['draft', 'cancelled'])
                 ->sum('grand_total');
 
-            $purchasesData[] = PurchaseInvoice::whereBetween('purchase_date', [$monthStart, $monthEnd])
+            $purchasesData[] = (float) PurchaseInvoice::whereBetween('purchase_date', [$monthStart, $monthEnd])
                 ->whereNotIn('status', ['draft', 'cancelled'])
                 ->sum('grand_total');
         }

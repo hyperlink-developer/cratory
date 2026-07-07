@@ -20,7 +20,7 @@
 
         <!-- Subtle footer -->
         <footer class="text-center py-4 text-text-muted text-xs">
-            &copy; {{ date('Y') }} Cratory. All rights reserved.
+            &copy; {{ date('Y') }} Cratory Inc. All rights reserved. <span class="mx-1">|</span> Developed with &hearts; by YB
         </footer>
     </div>
 

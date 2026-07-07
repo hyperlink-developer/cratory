@@ -19,6 +19,7 @@ class ReceiptForm extends Component
     public string $paymentMode = 'bank_transfer';
     public string $reference = '';
     public string $amountReceived = '';
+    public string $notes = '';
     
     // Allocations: invoice_id => amount_allocated
     public array $allocations = [];
@@ -92,6 +93,7 @@ class ReceiptForm extends Component
                 'payment_mode' => $this->paymentMode,
                 'reference_number' => $this->reference,
                 'amount' => $this->amountReceived,
+                'notes' => $this->notes,
                 'created_by' => auth()->id(),
             ]);
 
@@ -102,7 +104,7 @@ class ReceiptForm extends Component
                     if ($invoice && $invoice->balance_due >= $amount) {
                         $receipt->allocations()->create([
                             'invoice_id' => $invoiceId,
-                            'amount_allocated' => $amount,
+                            'allocated_amount' => $amount,
                         ]);
                         
                         $invoice->decrement('balance_due', $amount);

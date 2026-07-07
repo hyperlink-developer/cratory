@@ -10,7 +10,8 @@
             font-size: 14px;
             line-height: 1.5;
             margin: 0;
-            padding: 0;
+            padding: 40px;
+            background-color: #ffffff;
         }
         
         table {
@@ -217,6 +218,9 @@
                 @endif
                 <th class="text-center">Qty</th>
                 <th class="text-right">Rate</th>
+                @if(isset($template->show_fields['discount']) ? $template->show_fields['discount'] : true)
+                    <th class="text-right">Discount</th>
+                @endif
                 @if((isset($template->show_fields['tax']) ? $template->show_fields['tax'] : true) && (!$organization->gst_number || !$organization->is_composition_tax_payer))
                     <th class="text-right">Tax</th>
                 @endif
@@ -239,6 +243,18 @@
                 @endif
                 <td class="text-center">{{ $item->quantity + 0 }} {{ $item->unit }}</td>
                 <td class="text-right">{{ number_format($item->rate, 2) }}</td>
+                @if(isset($template->show_fields['discount']) ? $template->show_fields['discount'] : true)
+                <td class="text-right">
+                    @if($item->discount_amount > 0)
+                        {{ number_format($item->discount_amount, 2) }}
+                        @if($item->discount_percent > 0)
+                            <br><span style="font-size: 10px; color: #999;">({{ rtrim(rtrim($item->discount_percent, '0'), '.') }}%)</span>
+                        @endif
+                    @else
+                        -
+                    @endif
+                </td>
+                @endif
                 @if((isset($template->show_fields['tax']) ? $template->show_fields['tax'] : true) && (!$organization->gst_number || !$organization->is_composition_tax_payer))
                 <td class="text-right">
                     @if($item->tax_amount > 0)
@@ -260,6 +276,12 @@
             <th>Subtotal</th>
             <td>{{ number_format($invoice->subtotal, 2) }}</td>
         </tr>
+        @if($invoice->discount_total > 0)
+        <tr>
+            <th>Discount</th>
+            <td style="color: #ef4444;">-{{ number_format($invoice->discount_total, 2) }}</td>
+        </tr>
+        @endif
         @if($invoice->tax_total > 0)
         <tr>
             <th>Total Tax</th>
@@ -285,6 +307,22 @@
             </p>
         </div>
     @endif
+
+    <div style="clear: both; margin-top: 40px;">
+        @if($invoice->payment_info)
+            <div style="margin-bottom: 20px;">
+                <h4 style="margin: 0 0 5px 0; font-size: 13px; color: #666; text-transform: uppercase;">Payment Information</h4>
+                <p style="margin: 0; font-size: 12px; color: #333; white-space: pre-wrap;">{{ $invoice->payment_info }}</p>
+            </div>
+        @endif
+
+        @if($invoice->terms_and_conditions)
+            <div>
+                <h4 style="margin: 0 0 5px 0; font-size: 13px; color: #666; text-transform: uppercase;">Terms & Conditions</h4>
+                <p style="margin: 0; font-size: 12px; color: #333; white-space: pre-wrap;">{{ $invoice->terms_and_conditions }}</p>
+            </div>
+        @endif
+    </div>
 
     <div class="footer">
         @if($template->footer_note)

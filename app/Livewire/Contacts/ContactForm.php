@@ -44,8 +44,8 @@ class ContactForm extends Component
             'displayName' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
-            'gstNumber' => 'nullable|string|size:15|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/',
-            'panNumber' => 'nullable|string|size:10|regex:/^[A-Z]{5}[0-9]{4}[A-Z]$/',
+            'gstNumber' => 'nullable|string|size:15|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/i',
+            'panNumber' => 'nullable|string|size:10|regex:/^[A-Z]{5}[0-9]{4}[A-Z]$/i',
             'openingBalance' => 'required|numeric|min:0',
 
             'billingAddressLine1' => 'nullable|string|max:255',

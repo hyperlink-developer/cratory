@@ -33,7 +33,7 @@
                     <div class="flex items-start justify-between">
                         <div class="min-w-0">
                             <p class="font-bold text-text-primary truncate">{{ $receipt->contact->display_name }}</p>
-                            <p class="text-[0.7rem] text-text-muted mt-0.5">{{ $receipt->receipt_number }} • {{ $receipt->payment_date->format('d M, Y') }}</p>
+                            <p class="text-[0.7rem] text-text-muted mt-0.5">{{ $receipt->receipt_number }} • {{ $receipt->receipt_date->format('d M, Y') }}</p>
                         </div>
                         <div class="text-right flex-shrink-0 ml-4">
                             <p class="font-bold text-accent text-sm">₹{{ number_format($receipt->amount, 2) }}</p>
@@ -73,7 +73,7 @@
                     @forelse($receipts as $receipt)
                         <tr class="hover:bg-white/5 transition-colors group">
                             <td class="px-6 py-4 font-medium text-text-primary">{{ $receipt->receipt_number }}</td>
-                            <td class="px-6 py-4 text-text-secondary">{{ $receipt->payment_date->format('d M, Y') }}</td>
+                            <td class="px-6 py-4 text-text-secondary">{{ $receipt->receipt_date->format('d M, Y') }}</td>
                             <td class="px-6 py-4 font-medium text-text-primary">{{ $receipt->contact->display_name }}</td>
                             <td class="px-6 py-4">
                                 <span class="px-2 py-0.5 rounded text-xs bg-surface-lighter text-text-secondary border border-white/10 uppercase tracking-wide">

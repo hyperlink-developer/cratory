@@ -13,14 +13,46 @@
             }
         });
 
-        // Handle Livewire SPA navigation
-        document.addEventListener('livewire:navigating', (e) => {
-            if (this.isDirty) {
-                if (!confirm('You have unsaved changes. Are you sure you want to leave?')) {
-                    e.preventDefault();
-                }
+        // Handle Livewire SPA navigation using SweetAlert interceptor
+        document.addEventListener('click', (e) => {
+            if (!this.isDirty) return;
+            
+            let link = e.target.closest('a[href]');
+            if (!link) return;
+            
+            // if it's an internal link
+            if (link.host === window.location.host && !link.hasAttribute('target')) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                window.Swal.fire({
+                    background: '#151c2c',
+                    color: '#f8fafc',
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#374151',
+                    customClass: {
+                        popup: 'rounded-xl border border-white/10 shadow-2xl',
+                        confirmButton: 'rounded-lg font-medium px-4 py-2',
+                        cancelButton: 'rounded-lg font-medium px-4 py-2',
+                    },
+                    title: 'Unsaved Changes',
+                    text: 'You have unsaved changes. Are you sure you want to leave?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Leave anyway',
+                    cancelButtonText: 'Stay',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.isDirty = false;
+                        if (link.hasAttribute('wire:navigate')) {
+                            Livewire.navigate(link.href);
+                        } else {
+                            window.location.href = link.href;
+                        }
+                    }
+                });
             }
-        });
+        }, true);
     }
 }" @input="isDirty = true" @change="isDirty = true">
     <div class="flex items-start sm:items-center justify-between gap-4 mb-6">
@@ -129,6 +161,7 @@
                             <th class="px-4 py-3 w-1/3 min-w-[250px]">Item Details <span class="text-red-400">*</span></th>
                             <th class="px-4 py-3 w-32 min-w-[100px]">Quantity</th>
                             <th class="px-4 py-3 w-40 min-w-[120px]">Rate (₹)</th>
+                            <th class="px-4 py-3 w-40 min-w-[120px]">Discount</th>
                             <th class="px-4 py-3 w-48 min-w-[150px]">Tax</th>
                             <th class="px-4 py-3 w-32 min-w-[120px] text-right">Amount (₹)</th>
                             <th class="px-4 py-3 w-12 text-center"></th>
@@ -158,12 +191,32 @@
 
                             <!-- Quantity -->
                             <td class="px-4 py-3 align-top">
-                                <input wire:model.live="items.{{ $index }}.quantity" type="number" step="0.01" class="form-input py-1.5 text-sm w-full">
+                                <div class="flex flex-col gap-2">
+                                    <input wire:model.live="items.{{ $index }}.quantity" type="number" step="0.01" class="form-input py-1.5 text-sm w-full">
+                                    <select wire:model.live="items.{{ $index }}.unit" class="form-input py-1 text-xs cursor-pointer w-full text-text-muted">
+                                        <option value="nos">Numbers (nos)</option>
+                                        <option value="mts">Meters (mts)</option>
+                                        <option value="pcs">Pieces (pcs)</option>
+                                        <option value="hrs">Hours (hrs)</option>
+                                    </select>
+                                </div>
                             </td>
 
                             <!-- Rate -->
                             <td class="px-4 py-3 align-top">
                                 <input wire:model.live="items.{{ $index }}.rate" type="number" step="0.01" class="form-input py-1.5 text-sm w-full">
+                            </td>
+
+                            <!-- Discount -->
+                            <td class="px-4 py-3 align-top">
+                                <div class="flex rounded-lg border border-white/10 overflow-hidden focus-within:border-accent focus-within:ring-1 focus-within:ring-accent bg-surface w-full">
+                                    <input wire:model.live="items.{{ $index }}.discount_value" type="number" step="0.01" class="w-full bg-transparent border-0 px-2 py-1.5 text-sm text-text-primary focus:ring-0 min-w-0" placeholder="0">
+                                    <div class="h-full w-px bg-white/10"></div>
+                                    <select wire:model.live="items.{{ $index }}.discount_type" class="bg-transparent border-0 py-1.5 pl-2 pr-6 text-xs text-text-muted cursor-pointer focus:ring-0">
+                                        <option value="percent">%</option>
+                                        <option value="amount">₹</option>
+                                    </select>
+                                </div>
                             </td>
 
                             <!-- Tax -->
@@ -232,8 +285,16 @@
                     <div class="grid grid-cols-2 gap-4">
                         <!-- Quantity -->
                         <div>
-                            <label class="text-[0.65rem] text-text-muted uppercase mb-1 block">Quantity</label>
-                            <input wire:model.live="items.{{ $index }}.quantity" type="number" step="0.01" class="form-input py-1.5 text-sm w-full">
+                            <label class="text-[0.65rem] text-text-muted uppercase mb-1 block">Quantity & Unit</label>
+                            <div class="flex gap-2">
+                                <input wire:model.live="items.{{ $index }}.quantity" type="number" step="0.01" class="form-input py-1.5 text-sm w-1/2">
+                                <select wire:model.live="items.{{ $index }}.unit" class="form-input py-1.5 text-sm cursor-pointer w-1/2 text-text-muted">
+                                    <option value="nos">nos</option>
+                                    <option value="mts">mts</option>
+                                    <option value="pcs">pcs</option>
+                                    <option value="hrs">hrs</option>
+                                </select>
+                            </div>
                         </div>
 
                         <!-- Rate -->
@@ -243,7 +304,20 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4 items-start">
+                    <div class="grid grid-cols-2 gap-4 items-start mt-4">
+                        <!-- Discount -->
+                        <div>
+                            <label class="text-[0.65rem] text-text-muted uppercase mb-1 block">Discount</label>
+                            <div class="flex rounded-lg border border-white/10 overflow-hidden focus-within:border-accent focus-within:ring-1 focus-within:ring-accent bg-surface w-full">
+                                <input wire:model.live="items.{{ $index }}.discount_value" type="number" step="0.01" class="w-full bg-transparent border-0 px-2 py-1.5 text-sm text-text-primary focus:ring-0 min-w-0" placeholder="0">
+                                <div class="h-full w-px bg-white/10"></div>
+                                <select wire:model.live="items.{{ $index }}.discount_type" class="bg-transparent border-0 py-1.5 pl-2 pr-6 text-xs text-text-muted cursor-pointer focus:ring-0">
+                                    <option value="percent">%</option>
+                                    <option value="amount">₹</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <!-- Tax -->
                         <div>
                             <label class="text-[0.65rem] text-text-muted uppercase mb-1 block">Tax</label>
@@ -257,13 +331,17 @@
                                 <p class="text-[0.65rem] text-text-muted mt-1">+ ₹{{ number_format($item['tax_amount'], 2) }}</p>
                             @endif
                         </div>
+                    </div>
 
+                    <div class="mt-4">
                         <!-- Amount -->
-                        <div class="text-right">
+                        <div class="text-right border-t border-white/5 pt-2">
                             <label class="text-[0.65rem] text-text-muted uppercase mb-1 block text-right">Amount (₹)</label>
-                            <p class="font-medium text-text-primary mt-2">₹{{ number_format($item['line_total'], 2) }}</p>
+                            <p class="font-medium text-text-primary mt-1">₹{{ number_format($item['line_total'], 2) }}</p>
                         </div>
                     </div>
+
+
                 </div>
                 @endforeach
             </div>
@@ -309,6 +387,24 @@
                         <span class="text-text-secondary">Subtotal</span>
                         <span class="text-text-primary font-medium">₹{{ number_format($subtotal, 2) }}</span>
                     </div>
+                    
+                    <div class="flex items-center justify-between text-sm py-2">
+                        <span class="text-text-secondary">Global Discount</span>
+                        <div class="flex rounded-lg border border-white/10 overflow-hidden focus-within:border-accent focus-within:ring-1 focus-within:ring-accent bg-surface w-32">
+                            <input wire:model.live="globalDiscountValue" type="number" step="0.01" class="w-full bg-transparent border-0 px-2 py-1 text-sm text-text-primary text-right focus:ring-0 min-w-0" placeholder="0">
+                            <div class="h-full w-px bg-white/10"></div>
+                            <select wire:model.live="globalDiscountType" class="bg-transparent border-0 py-1 pl-2 pr-5 text-xs text-text-muted cursor-pointer focus:ring-0">
+                                <option value="percent">%</option>
+                                <option value="amount">₹</option>
+                            </select>
+                        </div>
+                    </div>
+                    @if($discountTotal > 0)
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-text-secondary">Total Discount</span>
+                        <span class="text-red-400 font-medium">- ₹{{ number_format($discountTotal, 2) }}</span>
+                    </div>
+                    @endif
                     @if($taxTotal > 0)
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-text-secondary">Tax Total</span>
@@ -329,8 +425,22 @@
             </div>
         </div>
 
+        <!-- Extra Info -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 p-6 bg-surface/30 rounded-xl border border-white/5">
+            <div class="flex flex-col gap-2">
+                <label class="form-label">Payment Information / Notes</label>
+                <textarea wire:model="paymentInfo" class="form-input min-h-[100px] resize-y" placeholder="Bank account details, UPI ID, or any other notes..."></textarea>
+                @error('paymentInfo') <p class="text-xs text-red-400 mt-1">{{ $message }}</p> @enderror
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="form-label">Terms & Conditions</label>
+                <textarea wire:model="termsAndConditions" class="form-input min-h-[100px] resize-y" placeholder="Warranty details, return policy, payment terms..."></textarea>
+                @error('termsAndConditions') <p class="text-xs text-red-400 mt-1">{{ $message }}</p> @enderror
+            </div>
+        </div>
+
         <!-- Actions -->
-        <div class="flex flex-col sm:flex-row items-center justify-end gap-4 pt-4">
+        <div class="flex flex-col sm:flex-row items-center justify-end gap-4 pt-6">
             <a href="{{ route('invoices.index') }}" class="btn btn-ghost w-full sm:w-auto" wire:navigate>Cancel</a>
             <button type="button" wire:click="save('draft')" @click="isDirty = false" class="btn btn-secondary w-full sm:w-auto">
                 Save as Draft

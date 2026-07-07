@@ -212,6 +212,7 @@ class PurchaseForm extends Component
                 'string', 'max:15'
             ],
             'items.*.quantity' => 'required|numeric|min:0.01',
+            'items.*.unit' => 'nullable|string|max:20',
             'items.*.rate' => 'required|numeric|min:0',
         ], [
             'contactId.required' => 'Please select a vendor.',
@@ -254,6 +255,24 @@ class PurchaseForm extends Component
                 
                 $this->purchase = PurchaseInvoice::create($data);
             } else {
+                if ($this->purchase->status->value !== 'draft') {
+                    // Reverse old stock movements before deleting
+                    foreach ($this->purchase->items as $item) {
+                        if ($item->product && $item->product->isProduct()) {
+                            $item->product->stockMovements()->create([
+                                'organization_id' => $organization->id,
+                                'product_id' => $item->product_id,
+                                'type' => \App\Enums\StockMovementType::AdjustmentOut,
+                                'quantity' => $item->quantity,
+                                'balance_after' => $item->product->current_stock - $item->quantity,
+                                'notes' => 'Purchase Bill Edit Reversal #' . $this->purchase->vendor_bill_number,
+                                'created_by' => auth()->id(),
+                            ]);
+                            $item->product->decrement('current_stock', $item->quantity);
+                        }
+                    }
+                }
+
                 if ($this->purchase->status->value === 'draft' && $statusAction === 'receive') {
                     $data['status'] = $this->invoiceBasis === 'cash' ? PurchaseStatus::Paid : PurchaseStatus::Received;
                 }
@@ -279,8 +298,9 @@ class PurchaseForm extends Component
             
             // Stock movements: Increment stock if received
             if ($statusAction === 'receive') {
+                $this->purchase->refresh(); // Refresh relation to load newly created items!
                 foreach ($this->purchase->items as $item) {
-                    if ($item->product->isProduct()) {
+                    if ($item->product && $item->product->isProduct()) {
                         $item->product->stockMovements()->create([
                             'organization_id' => $organization->id,
                             'product_id' => $item->product_id,

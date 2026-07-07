@@ -10,6 +10,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts" data-navigate-track></script>
 </head>
 <body class="antialiased">
 
@@ -160,6 +161,7 @@
                     <div class="py-1 pl-11 space-y-1">
                         <a href="{{ route('settings.tax-rates') }}" class="block px-3 py-2 rounded-lg text-sm {{ request()->routeIs('settings.tax-rates') ? 'text-accent bg-accent/10 font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-white/5' }}">Tax Rates</a>
                         <a href="{{ route('settings.invoice-templates') }}" class="block px-3 py-2 rounded-lg text-sm {{ request()->routeIs('settings.invoice-templates') ? 'text-accent bg-accent/10 font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-white/5' }}">Invoice Templates</a>
+                        <a href="{{ route('settings.users') }}" class="block px-3 py-2 rounded-lg text-sm {{ request()->routeIs('settings.users') ? 'text-accent bg-accent/10 font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-white/5' }}">User Management</a>
                     </div>
                 </div>
             </div>
@@ -410,6 +412,7 @@
                         <div class="py-1 pl-14 space-y-1">
                             <a href="{{ route('settings.tax-rates') }}" class="block px-3 py-2.5 rounded-lg text-sm {{ request()->routeIs('settings.tax-rates') ? 'text-accent bg-accent/10 font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-white/5' }}">Tax Rates</a>
                             <a href="{{ route('settings.invoice-templates') }}" class="block px-3 py-2.5 rounded-lg text-sm {{ request()->routeIs('settings.invoice-templates') ? 'text-accent bg-accent/10 font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-white/5' }}">Invoice Templates</a>
+                            <a href="{{ route('settings.users') }}" class="block px-3 py-2.5 rounded-lg text-sm {{ request()->routeIs('settings.users') ? 'text-accent bg-accent/10 font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-white/5' }}">User Management</a>
                         </div>
                     </div>
                 </div>
@@ -435,6 +438,5 @@
     </div>
 
     @livewireScripts
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </body>
 </html>

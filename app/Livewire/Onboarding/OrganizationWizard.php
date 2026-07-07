@@ -55,8 +55,8 @@ class OrganizationWizard extends Component
                 'businessCategory' => 'required|string',
             ],
             2 => [
-                'panNumber' => 'required|string|size:10|regex:/^[A-Z]{5}[0-9]{4}[A-Z]$/',
-                'gstNumber' => 'nullable|string|size:15|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/',
+                'panNumber' => 'required|string|size:10|regex:/^[A-Z]{5}[0-9]{4}[A-Z]$/i',
+                'gstNumber' => 'nullable|string|size:15|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/i',
                 'isComposition' => 'boolean',
             ],
             3 => [
@@ -147,9 +147,9 @@ class OrganizationWizard extends Component
                 'created_by' => $user->id,
             ]);
 
-            // Attach user as commander
+            // Attach user as org admin
             $org->users()->attach($user->id, [
-                'role' => OrgUserRole::Commander->value,
+                'role' => OrgUserRole::OrgAdmin->value,
                 'is_default_org' => !$user->hasOrganizations(),
                 'status' => OrgUserStatus::Active->value,
             ]);

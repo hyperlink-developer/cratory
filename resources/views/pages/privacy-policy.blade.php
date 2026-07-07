@@ -30,7 +30,7 @@
             <p class="text-text-muted mb-6">We have put in place appropriate security measures to prevent your personal data from being accidentally lost, used or accessed in an unauthorised way, altered or disclosed. In addition, we limit access to your personal data to those employees, agents, contractors and other third parties who have a business need to know.</p>
 
             <h2 class="text-2xl font-bold text-white mt-10 mb-4">5. Contact details</h2>
-            <p class="text-text-muted mb-6">If you have any questions about this privacy policy or our privacy practices, please contact us at <a href="mailto:support@cratory.com" class="text-primary hover:underline">support@cratory.com</a>.</p>
+            <p class="text-text-muted mb-6">If you have any questions about this privacy policy or our privacy practices, please contact us at <a href="mailto:cratory.support@yagneshbhanani.com" class="text-primary hover:underline">cratory.support@yagneshbhanani.com</a>.</p>
         </div>
     </div>
 </x-layouts.public>
