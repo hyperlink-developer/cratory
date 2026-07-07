@@ -21,6 +21,8 @@ class InvoiceTemplate extends Model
         'show_fields',
         'header_note',
         'footer_note',
+        'default_payment_info',
+        'default_terms_and_conditions',
         'font_choice',
     ];
 

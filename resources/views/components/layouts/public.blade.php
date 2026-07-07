@@ -7,6 +7,7 @@
 
     @fonts
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @livewireStyles
 </head>
 <body class="bg-surface text-text-primary font-sans antialiased selection:bg-primary/30 min-h-screen flex flex-col relative overflow-x-hidden">
     
@@ -61,10 +62,12 @@
                     <a href="{{ route('contact-support') }}" class="hover:text-primary transition-colors">Contact Support</a>
                 </div>
             </div>
-            <div class="mt-8 text-center text-xs text-text-muted/50">
-                &copy; {{ date('Y') }} Cratory. All rights reserved.
-            </div>
+            <p class="text-sm text-text-muted/70 text-center mt-8">
+                &copy; {{ date('Y') }} Cratory Inc. All rights reserved. <span class="mx-1">|</span> Developed with &hearts; by YB
+            </p>
         </div>
     </footer>
+
+    @livewireScripts
 </body>
 </html>

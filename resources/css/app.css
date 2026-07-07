@@ -521,3 +521,5 @@ span.flatpickr-weekday {
         padding-bottom: 0;
     }
 }
+
+[x-cloak] { display: none !important; }

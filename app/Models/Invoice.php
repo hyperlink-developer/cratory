@@ -34,6 +34,7 @@ class Invoice extends Model
         'balance_due',
         'status',
         'notes',
+        'payment_info',
         'terms_and_conditions',
         'place_of_supply',
         'created_by',

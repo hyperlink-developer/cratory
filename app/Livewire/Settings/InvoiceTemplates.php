@@ -21,6 +21,8 @@ class InvoiceTemplates extends Component
         'hsn' => true,
         'tax_details' => true,
     ];
+    public ?string $defaultPaymentInfo = null;
+    public ?string $defaultTermsAndConditions = null;
 
     public function mount()
     {
@@ -56,11 +58,18 @@ class InvoiceTemplates extends Component
     {
         if ($this->activeTemplate) {
             $this->name = $this->activeTemplate->name;
-            $this->slug = $this->activeTemplate->slug ?? 'standard';
+            
+            $slug = $this->activeTemplate->slug ?? 'standard';
+            $validSlugs = ['standard', 'modern', 'minimal', 'elegant'];
+            $this->slug = in_array($slug, $validSlugs) ? $slug : 'standard';
+            
             $this->colorPrimary = $this->activeTemplate->color_primary;
             $this->colorSecondary = $this->activeTemplate->color_secondary;
             $this->fontChoice = $this->activeTemplate->font_choice ?? 'Helvetica';
             $this->showFields = array_merge($this->showFields, $this->activeTemplate->show_fields ?? []);
+            
+            $this->defaultPaymentInfo = $this->activeTemplate->default_payment_info;
+            $this->defaultTermsAndConditions = $this->activeTemplate->default_terms_and_conditions;
         }
     }
 
@@ -76,6 +85,8 @@ class InvoiceTemplates extends Component
             'slug' => 'required|in:standard,modern,minimal,elegant',
             'colorPrimary' => 'required|string',
             'colorSecondary' => 'required|string',
+            'defaultPaymentInfo' => 'nullable|string',
+            'defaultTermsAndConditions' => 'nullable|string',
         ]);
 
         if ($this->activeTemplate) {
@@ -86,10 +97,96 @@ class InvoiceTemplates extends Component
                 'color_secondary' => $this->colorSecondary,
                 'font_choice' => $this->fontChoice,
                 'show_fields' => $this->showFields,
+                'default_payment_info' => $this->defaultPaymentInfo,
+                'default_terms_and_conditions' => $this->defaultTermsAndConditions,
             ]);
         }
 
         $this->dispatch('notify', ['message' => 'Template settings saved successfully!']);
+    }
+
+    public function getPreviewHtml()
+    {
+        $organization = auth()->user()->currentOrganization;
+        
+        $invoice = new \stdClass();
+        $invoice->invoice_number = 'INV-2026-001';
+        $invoice->invoice_date = now();
+        $invoice->due_date = now()->addDays(14);
+        $invoice->notes = 'Thank you for your business!';
+        $invoice->terms = 'Payment is due within 14 days.';
+        $invoice->invoice_type = (object)['value' => 'sales'];
+        $invoice->subtotal = 1700.00;
+        $invoice->tax_total = 306.00;
+        $invoice->discount_total = 0;
+        $invoice->round_off = 0;
+        $invoice->grand_total = 2006.00;
+        $invoice->amount_paid = 0;
+        $invoice->balance_due = 2006.00;
+        $invoice->status = \App\Enums\InvoiceStatus::Sent;
+        $invoice->payment_info = "Bank: State Bank of India\nAcct: 334455667788\nIFSC: SBIN0001234";
+        $invoice->terms_and_conditions = "1. Payment is due within 15 days.\n2. Goods once sold will not be taken back.";
+        
+        $template = new \stdClass();
+        $template->font_choice = $this->fontChoice;
+        $template->color_primary = $this->colorPrimary;
+        $template->color_secondary = $this->colorSecondary;
+        $template->show_fields = $this->showFields;
+        $template->footer_note = 'Thank you for your business!';
+
+        $contact = new \stdClass();
+        $contact->name = 'Acme Corporation';
+        $contact->billing_address_line_1 = '123 Business Rd.';
+        $contact->billing_address_line_2 = 'Suite 100';
+        $contact->billing_city = 'Tech City';
+        $contact->billing_state = 'Tech State';
+        $contact->billing_pincode = '10101';
+        $contact->billing_country = 'India';
+        
+        $contact->shipping_address_line_1 = '456 Warehouse Blvd.';
+        $contact->shipping_address_line_2 = 'Building B';
+        $contact->shipping_city = 'Tech City';
+        $contact->shipping_state = 'Tech State';
+        $contact->shipping_pincode = '10101';
+        $contact->shipping_country = 'India';
+        
+        $contact->gst_number = '27AADCB2230M1Z2';
+        $contact->phone = '+1 (555) 123-4567';
+
+        $items = collect([
+            (object)[
+                'product' => null,
+                'item_name' => 'Web Design Services',
+                'description' => 'Complete website design and development',
+                'hsn_code' => '9983',
+                'quantity' => 1,
+                'unit' => 'pcs',
+                'rate' => 1500.00,
+                'tax_amount' => 270.00,
+                'taxRate' => (object)['percentage' => '18.00'],
+                'line_total' => 1770.00
+            ],
+            (object)[
+                'product' => null,
+                'item_name' => 'Hosting (1 Year)',
+                'description' => 'Premium cloud hosting',
+                'hsn_code' => '9984',
+                'quantity' => 1,
+                'unit' => 'pcs',
+                'rate' => 200.00,
+                'tax_amount' => 36.00,
+                'taxRate' => (object)['percentage' => '18.00'],
+                'line_total' => 236.00
+            ]
+        ]);
+        $invoice->items = $items;
+
+        return view('pdf.templates.' . $this->slug, [
+            'invoice' => $invoice,
+            'template' => $template,
+            'organization' => $organization,
+            'contact' => $contact,
+        ])->render();
     }
 
     public function render()

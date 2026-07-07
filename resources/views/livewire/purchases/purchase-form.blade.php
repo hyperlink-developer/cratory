@@ -117,7 +117,15 @@
                                 </div>
                             </td>
                             <td class="px-4 py-3 align-top">
-                                <input wire:model.live="items.{{ $index }}.quantity" type="number" step="0.01" class="form-input py-1.5 text-sm">
+                                <div class="flex flex-col gap-2">
+                                    <input wire:model.live="items.{{ $index }}.quantity" type="number" step="0.01" class="form-input py-1.5 text-sm">
+                                    <select wire:model.live="items.{{ $index }}.unit" class="form-input py-1 text-xs cursor-pointer w-full text-text-muted">
+                                        <option value="nos">Numbers (nos)</option>
+                                        <option value="mts">Meters (mts)</option>
+                                        <option value="pcs">Pieces (pcs)</option>
+                                        <option value="hrs">Hours (hrs)</option>
+                                    </select>
+                                </div>
                             </td>
                             <td class="px-4 py-3 align-top">
                                 <input wire:model.live="items.{{ $index }}.rate" type="number" step="0.01" class="form-input py-1.5 text-sm">

@@ -19,6 +19,7 @@ class VoucherForm extends Component
     public string $paymentMode = 'bank_transfer';
     public string $reference = '';
     public string $amountPaid = '';
+    public string $notes = '';
     
     // Allocations: purchase_invoice_id => amount_allocated
     public array $allocations = [];
@@ -91,6 +92,7 @@ class VoucherForm extends Component
                 'payment_mode' => $this->paymentMode,
                 'reference_number' => $this->reference,
                 'amount' => $this->amountPaid,
+                'notes' => $this->notes,
                 'created_by' => auth()->id(),
             ]);
 
@@ -101,7 +103,7 @@ class VoucherForm extends Component
                     if ($bill && $bill->balance_due >= $amount) {
                         $voucher->allocations()->create([
                             'purchase_invoice_id' => $billId,
-                            'amount_allocated' => $amount,
+                            'allocated_amount' => $amount,
                         ]);
                         
                         $bill->decrement('balance_due', $amount);

@@ -32,9 +32,17 @@ class InvoiceForm extends Component
     // Totals
     public float $subtotal = 0.00;
     public float $taxTotal = 0.00;
-    public float $discountTotal = 0.00;
+    public float $discountTotal = 0.00; // Invoice-level global discount amount
+    
+    public string $globalDiscountType = 'amount'; // 'amount' or 'percent'
+    public float $globalDiscountValue = 0.00;
+    
     public float $roundOff = 0.00;
     public float $grandTotal = 0.00;
+
+    // Extra Info
+    public ?string $paymentInfo = null;
+    public ?string $termsAndConditions = null;
 
     // Contact Details
     public array $contacts = [];
@@ -74,6 +82,8 @@ class InvoiceForm extends Component
             $this->invoiceNumber = $invoice->invoice_number ?? '';
             $this->invoiceDate = $invoice->invoice_date?->format('Y-m-d') ?? '';
             $this->dueDate = $invoice->due_date?->format('Y-m-d') ?? '';
+            $this->paymentInfo = $invoice->payment_info;
+            $this->termsAndConditions = $invoice->terms_and_conditions;
             
             foreach ($invoice->items as $item) {
                 $this->items[] = [
@@ -83,16 +93,31 @@ class InvoiceForm extends Component
                     'quantity' => $item->quantity,
                     'unit' => $item->unit,
                     'rate' => $item->rate,
+                    'discount_type' => $item->discount_percent > 0 ? 'percent' : 'amount',
+                    'discount_value' => $item->discount_percent > 0 ? $item->discount_percent : $item->discount_amount,
+                    'discount_amount' => $item->discount_amount,
                     'tax_rate_id' => $item->tax_rate_id,
                     'tax_amount' => $item->tax_amount,
                     'line_total' => $item->line_total,
                 ];
             }
+            $this->globalDiscountValue = $this->invoice->discount_total;
+            $this->globalDiscountType = 'amount'; // Existing invoices only stored total amount
             $this->calculateTotals();
         } else {
             $this->invoiceNumber = app(DocumentNumberGenerator::class)->peek(auth()->user()->currentOrganization, 'INV');
             $this->invoiceDate = date('Y-m-d');
             $this->dueDate = date('Y-m-d', strtotime('+15 days'));
+            
+            $defaultTemplate = \App\Models\InvoiceTemplate::where('organization_id', auth()->user()->currentOrganization->id)
+                ->where('is_default', true)
+                ->first();
+                
+            if ($defaultTemplate) {
+                $this->paymentInfo = $defaultTemplate->default_payment_info;
+                $this->termsAndConditions = $defaultTemplate->default_terms_and_conditions;
+            }
+            
             $this->addItem(); // Add first empty row
         }
     }
@@ -107,6 +132,9 @@ class InvoiceForm extends Component
             'quantity' => 1,
             'unit' => 'pcs',
             'rate' => 0.00,
+            'discount_type' => 'percent',
+            'discount_value' => 0.00,
+            'discount_amount' => 0.00,
             'tax_rate_id' => null,
             'tax_amount' => 0.00,
             'line_total' => 0.00,
@@ -140,6 +168,16 @@ class InvoiceForm extends Component
             }
         }
         
+        $this->calculateTotals();
+    }
+
+    public function updatedGlobalDiscountValue()
+    {
+        $this->calculateTotals();
+    }
+
+    public function updatedGlobalDiscountType()
+    {
         $this->calculateTotals();
     }
 
@@ -196,32 +234,57 @@ class InvoiceForm extends Component
     {
         $this->subtotal = 0;
         $this->taxTotal = 0;
+        $lineItemDiscounts = 0;
         
         foreach ($this->items as $index => $item) {
             $qty = floatval($item['quantity']);
             $rate = floatval($item['rate']);
             $lineSubtotal = $qty * $rate;
             
+            // Calculate item discount
+            $discountVal = floatval($item['discount_value'] ?? 0);
+            $itemDiscountAmount = 0;
+            if (($item['discount_type'] ?? 'percent') === 'percent') {
+                $itemDiscountAmount = $lineSubtotal * ($discountVal / 100);
+            } else {
+                $itemDiscountAmount = $discountVal;
+            }
+            $this->items[$index]['discount_amount'] = $itemDiscountAmount;
+            
+            $discountedSubtotal = $lineSubtotal - $itemDiscountAmount;
+            
             $taxAmount = 0;
             if ($item['tax_rate_id']) {
                 $tax = collect($this->taxRates)->firstWhere('id', $item['tax_rate_id']);
                 if ($tax) {
-                    $taxAmount = round($lineSubtotal * ($tax['percentage'] / 100), 2);
+                    $taxAmount = round($discountedSubtotal * ($tax['percentage'] / 100), 2);
                 }
             }
             
             $this->items[$index]['tax_amount'] = $taxAmount;
-            $this->items[$index]['line_total'] = round($lineSubtotal + $taxAmount, 2);
+            $this->items[$index]['line_total'] = round($discountedSubtotal + $taxAmount, 2);
             
-            $this->subtotal += $lineSubtotal;
+            $this->subtotal += $lineSubtotal; // Subtotal before line item discounts
             $this->taxTotal += $taxAmount;
+            $lineItemDiscounts += $itemDiscountAmount;
         }
         
-        $rawTotal = $this->subtotal + $this->taxTotal;
+        // Calculate global discount
+        $globalDiscountAmount = 0;
+        $gDiscVal = floatval($this->globalDiscountValue);
+        if ($this->globalDiscountType === 'percent') {
+            $globalDiscountAmount = $this->subtotal * ($gDiscVal / 100);
+        } else {
+            $globalDiscountAmount = $gDiscVal;
+        }
+        
+        $this->discountTotal = $lineItemDiscounts + $globalDiscountAmount;
+        
+        $rawTotal = $this->subtotal + $this->taxTotal - $this->discountTotal;
         $roundedTotal = round($rawTotal);
         
         $this->roundOff = round($roundedTotal - $rawTotal, 2);
-        $this->grandTotal = $roundedTotal;
+        $this->grandTotal = max(0, $roundedTotal);
     }
 
     public function save(string $statusAction = 'draft')
@@ -232,6 +295,13 @@ class InvoiceForm extends Component
             'invoiceDate' => 'required|date',
             'dueDate' => $this->invoiceBasis === 'cash' ? 'nullable|date' : 'required|date',
             'invoiceBasis' => 'required|in:cash,credit',
+            'items.*.discount_type' => 'required|in:percent,amount',
+            'items.*.discount_value' => 'nullable|numeric|min:0',
+            'items.*.tax_rate_id' => 'nullable|exists:tax_rates,id',
+            'paymentInfo' => 'nullable|string',
+            'termsAndConditions' => 'nullable|string',
+            'globalDiscountType' => 'required|in:percent,amount',
+            'globalDiscountValue' => 'nullable|numeric|min:0',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'nullable|exists:products,id',
             'items.*.item_name' => 'required_without:items.*.product_id|string|max:255',
@@ -241,6 +311,7 @@ class InvoiceForm extends Component
                 'string', 'max:15'
             ],
             'items.*.quantity' => 'required|numeric|min:0.01',
+            'items.*.unit' => 'nullable|string|max:20',
             'items.*.rate' => 'required|numeric|min:0',
         ], [
             'contactId.required' => 'Please select a customer.',
@@ -269,6 +340,8 @@ class InvoiceForm extends Component
                 'discount_total' => $this->discountTotal,
                 'round_off' => $this->roundOff,
                 'grand_total' => $this->grandTotal,
+                'payment_info' => $this->paymentInfo,
+                'terms_and_conditions' => $this->termsAndConditions,
                 'balance_due' => $this->grandTotal, // Since no payment yet
                 'amount_paid' => 0,
             ];
@@ -287,6 +360,24 @@ class InvoiceForm extends Component
                 
                 $this->invoice = Invoice::create($data);
             } else {
+                if ($this->invoice->status->value !== 'draft') {
+                    // Reverse old stock movements before deleting
+                    foreach ($this->invoice->items as $item) {
+                        if ($item->product && $item->product->isProduct()) {
+                            $item->product->stockMovements()->create([
+                                'organization_id' => $organization->id,
+                                'product_id' => $item->product_id,
+                                'type' => \App\Enums\StockMovementType::AdjustmentIn,
+                                'quantity' => $item->quantity,
+                                'balance_after' => $item->product->current_stock + $item->quantity,
+                                'notes' => 'Sales Invoice Edit Reversal #' . $this->invoice->invoice_number,
+                                'created_by' => auth()->id(),
+                            ]);
+                            $item->product->increment('current_stock', $item->quantity);
+                        }
+                    }
+                }
+
                 if ($this->invoice->status->value === 'draft' && $statusAction === 'send') {
                     $data['status'] = $this->invoiceBasis === 'cash' ? InvoiceStatus::Paid : InvoiceStatus::Sent;
                 }
@@ -299,17 +390,19 @@ class InvoiceForm extends Component
             }
 
             foreach ($this->items as $item) {
-                $this->invoice->items()->create([
-                    'product_id' => $item['product_id'] ?: null,
+                $isPercent = ($item['discount_type'] ?? 'percent') === 'percent';
+                
+                InvoiceItem::create([
+                    'invoice_id' => $this->invoice->id,
+                    'product_id' => $item['product_id'],
                     'item_name' => $item['item_name'] ?? null,
-                    'description' => $item['description'] ?? null,
-                    'hsn_code' => $item['hsn_code'] ?? null,
+                    'description' => $item['description'],
                     'quantity' => $item['quantity'],
                     'unit' => $item['unit'],
                     'rate' => $item['rate'],
-                    'discount_percent' => 0,
-                    'discount_amount' => 0,
-                    'tax_rate_id' => $item['tax_rate_id'],
+                    'discount_percent' => $isPercent ? ($item['discount_value'] ?? 0) : 0,
+                    'discount_amount' => $item['discount_amount'] ?? 0,
+                    'tax_rate_id' => $item['tax_rate_id'] ?: null,
                     'tax_amount' => $item['tax_amount'],
                     'line_total' => $item['line_total'],
                 ]);
@@ -318,8 +411,9 @@ class InvoiceForm extends Component
             // Stock movements would happen here if status becomes Sent and type is Sales.
             // Let's implement stock deduction if sent.
             if ($statusAction === 'send' && $this->type === 'sales') {
+                $this->invoice->refresh(); // Refresh relation to load newly created items!
                 foreach ($this->invoice->items as $item) {
-                    if ($item->product->isProduct()) {
+                    if ($item->product && $item->product->isProduct()) {
                         $item->product->stockMovements()->create([
                             'organization_id' => $organization->id,
                             'product_id' => $item->product_id,

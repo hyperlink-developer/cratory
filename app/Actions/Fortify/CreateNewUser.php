@@ -24,7 +24,7 @@ class CreateNewUser implements CreatesNewUsers
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
-            'is_commander' => true, // New signups are always commanders
+            'is_commander' => false, // Commanders must be created manually in DB
         ]);
     }
 }

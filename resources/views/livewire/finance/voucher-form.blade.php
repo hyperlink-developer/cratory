@@ -53,6 +53,11 @@
                         <label class="form-label">Reference Number <span class="text-xs font-normal text-text-muted">(Optional)</span></label>
                         <input wire:model="reference" type="text" class="form-input" placeholder="e.g. UTR Number">
                     </div>
+
+                    <div>
+                        <label class="form-label">Notes <span class="text-xs font-normal text-text-muted">(Optional)</span></label>
+                        <textarea wire:model="notes" rows="3" class="form-input" placeholder="Internal notes..."></textarea>
+                    </div>
                     
                     <button type="button" wire:click="save" class="btn btn-primary w-full mt-4">
                         Save Payment

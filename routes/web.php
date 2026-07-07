@@ -15,6 +15,9 @@ Route::view('/', 'welcome')->name('welcome');
 Route::view('/privacy-policy', 'pages.privacy-policy')->name('privacy-policy');
 Route::view('/terms-of-service', 'pages.terms-of-service')->name('terms-of-service');
 Route::view('/contact-support', 'pages.contact-support')->name('contact-support');
+Route::view('/integrations', 'pages.integrations')->name('integrations');
+Route::view('/changelog', 'pages.changelog')->name('changelog');
+Route::view('/help-center', 'pages.help-center')->name('help-center');
 
 // Auth routes are handled by Fortify
 
@@ -87,6 +90,7 @@ Route::middleware(['auth', SetCurrentOrganization::class])->group(function () {
         // Settings
         Route::get('/settings/tax-rates', \App\Livewire\Settings\TaxRates::class)->name('settings.tax-rates');
         Route::get('/settings/invoice-templates', \App\Livewire\Settings\InvoiceTemplates::class)->name('settings.invoice-templates');
+        Route::get('/settings/users', \App\Livewire\Settings\UserManagement::class)->name('settings.users');
 
         // Logout
         Route::post('/logout', function () {
