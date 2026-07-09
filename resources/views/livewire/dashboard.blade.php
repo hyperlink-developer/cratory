@@ -9,6 +9,7 @@
             <button wire:click="setPeriod('week')" class="px-4 py-1.5 text-xs font-medium rounded-md transition-colors {{ $period === 'week' ? 'bg-surface text-text-primary shadow-sm' : 'text-text-muted hover:text-text-secondary' }}">Week</button>
             <button wire:click="setPeriod('month')" class="px-4 py-1.5 text-xs font-medium rounded-md transition-colors {{ $period === 'month' ? 'bg-surface text-text-primary shadow-sm' : 'text-text-muted hover:text-text-secondary' }}">Month</button>
             <button wire:click="setPeriod('quarter')" class="px-4 py-1.5 text-xs font-medium rounded-md transition-colors {{ $period === 'quarter' ? 'bg-surface text-text-primary shadow-sm' : 'text-text-muted hover:text-text-secondary' }}">Quarter</button>
+            <button wire:click="setPeriod('year')" class="px-4 py-1.5 text-xs font-medium rounded-md transition-colors {{ $period === 'year' ? 'bg-surface text-text-primary shadow-sm' : 'text-text-muted hover:text-text-secondary' }}">Year</button>
         </div>
     </div>
 

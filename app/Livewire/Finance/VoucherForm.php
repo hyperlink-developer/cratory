@@ -15,6 +15,7 @@ class VoucherForm extends Component
     public $openBills = [];
 
     public ?int $contactId = null;
+    public string $voucherNumber = '';
     public string $paymentDate = '';
     public string $paymentMode = 'bank_transfer';
     public string $reference = '';
@@ -28,6 +29,7 @@ class VoucherForm extends Component
     {
         $this->contacts = Contact::active()->vendors()->orderBy('display_name')->get();
         $this->paymentDate = date('Y-m-d');
+        $this->voucherNumber = app(DocumentNumberGenerator::class)->peek(auth()->user()->currentOrganization, 'PAY');
     }
 
     public function updatedContactId($value)
@@ -69,6 +71,7 @@ class VoucherForm extends Component
     {
         $this->validate([
             'contactId' => 'required|exists:contacts,id',
+            'voucherNumber' => 'required|string|max:255|unique:payment_vouchers,voucher_number',
             'paymentDate' => 'required|date',
             'amountPaid' => 'required|numeric|min:0.01',
             'paymentMode' => 'required|string',
@@ -82,12 +85,11 @@ class VoucherForm extends Component
 
         DB::transaction(function () {
             $org = auth()->user()->currentOrganization;
-            $generator = app(DocumentNumberGenerator::class);
             
             $voucher = PaymentVoucher::create([
                 'organization_id' => $org->id,
                 'contact_id' => $this->contactId,
-                'voucher_number' => $generator->generate($org, 'PAY'),
+                'voucher_number' => $this->voucherNumber,
                 'voucher_date' => $this->paymentDate,
                 'payment_mode' => $this->paymentMode,
                 'reference_number' => $this->reference,

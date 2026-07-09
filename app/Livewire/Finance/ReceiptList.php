@@ -23,15 +23,14 @@ class ReceiptList extends Component
     {
         $receipt = Receipt::where('uuid', $uuid)->firstOrFail();
         
-        // When deleting a receipt, we must revert the balance on allocated invoices
-        foreach ($receipt->allocations as $allocation) {
-            $allocation->invoice->increment('balance_due', $allocation->amount_allocated);
-            if ($allocation->invoice->balance_due > 0 && $allocation->invoice->status->value === 'paid') {
-                $allocation->invoice->update(['status' => 'partial']);
-            }
-        }
+        $invoices = $receipt->allocations->map->invoice->unique();
         
         $receipt->delete();
+        
+        foreach ($invoices as $invoice) {
+            $invoice->recalculateAmountPaid();
+        }
+        
         $this->dispatch('notify', ['message' => 'Receipt deleted successfully']);
     }
 

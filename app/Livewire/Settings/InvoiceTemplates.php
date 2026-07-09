@@ -162,6 +162,8 @@ class InvoiceTemplates extends Component
                 'quantity' => 1,
                 'unit' => 'pcs',
                 'rate' => 1500.00,
+                'discount_amount' => 0,
+                'discount_percent' => 0,
                 'tax_amount' => 270.00,
                 'taxRate' => (object)['percentage' => '18.00'],
                 'line_total' => 1770.00
@@ -174,6 +176,8 @@ class InvoiceTemplates extends Component
                 'quantity' => 1,
                 'unit' => 'pcs',
                 'rate' => 200.00,
+                'discount_amount' => 0,
+                'discount_percent' => 0,
                 'tax_amount' => 36.00,
                 'taxRate' => (object)['percentage' => '18.00'],
                 'line_total' => 236.00

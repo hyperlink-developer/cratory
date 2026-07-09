@@ -24,6 +24,12 @@
                     </div>
 
                     <div>
+                        <label class="form-label">Receipt Number <span class="text-red-400">*</span></label>
+                        <input wire:model="receiptNumber" type="text" class="form-input">
+                        @error('receiptNumber') <p class="mt-1.5 text-xs text-red-400">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
                         <label class="form-label">Amount Received <span class="text-red-400">*</span></label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

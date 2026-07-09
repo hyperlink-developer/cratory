@@ -90,6 +90,7 @@ Route::middleware(['auth', SetCurrentOrganization::class])->group(function () {
         // Settings
         Route::get('/settings/tax-rates', \App\Livewire\Settings\TaxRates::class)->name('settings.tax-rates');
         Route::get('/settings/invoice-templates', \App\Livewire\Settings\InvoiceTemplates::class)->name('settings.invoice-templates');
+        Route::get('/settings/document-numbering', \App\Livewire\Settings\DocumentNumbering::class)->name('settings.document-numbering');
         Route::get('/settings/users', \App\Livewire\Settings\UserManagement::class)->name('settings.users');
 
         // Logout
