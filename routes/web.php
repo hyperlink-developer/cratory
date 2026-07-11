@@ -87,8 +87,8 @@ Route::middleware(['auth', SetCurrentOrganization::class])->group(function () {
         Route::get('/reports/trial-balance/export/pdf', [\App\Http\Controllers\ReportExportController::class, 'exportTrialBalancePdf'])->name('reports.trial-balance.pdf');
         Route::get('/reports/balance-sheet/export/pdf', [\App\Http\Controllers\ReportExportController::class, 'exportBalanceSheetPdf'])->name('reports.balance-sheet.pdf');
 
-        // Settings
         Route::get('/settings/tax-rates', \App\Livewire\Settings\TaxRates::class)->name('settings.tax-rates');
+        Route::get('/settings/unit-of-measures', \App\Livewire\Settings\UnitOfMeasures::class)->name('settings.uoms');
         Route::get('/settings/invoice-templates', \App\Livewire\Settings\InvoiceTemplates::class)->name('settings.invoice-templates');
         Route::get('/settings/document-numbering', \App\Livewire\Settings\DocumentNumbering::class)->name('settings.document-numbering');
         Route::get('/settings/users', \App\Livewire\Settings\UserManagement::class)->name('settings.users');

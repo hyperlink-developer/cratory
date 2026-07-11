@@ -29,6 +29,7 @@
         <p>Period: {{ \Carbon\Carbon::parse($startDate)->format('M d, Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('M d, Y') }}</p>
     </div>
 
+    @if($layout === 'linear')
     <table>
         <!-- REVENUE -->
         <thead>
@@ -98,5 +99,86 @@
             </tr>
         </tbody>
     </table>
+    @else
+    <table style="border: none; margin-top: 0;">
+        <tr>
+            <!-- LEFT (EXPENSES) -->
+            <td style="width: 50%; vertical-align: top; padding: 0; border: none; border-right: 1px solid #ddd;">
+                <table style="margin-top: 0;">
+                    <thead>
+                        <tr><th colspan="2">Particulars (Expenses)</th></tr>
+                    </thead>
+                    <tbody>
+                        @forelse($reportData['expenses'] as $group)
+                            <tr><td colspan="2" class="group-header">{{ $group['group'] }}</td></tr>
+                            @foreach($group['accounts'] as $account)
+                            <tr>
+                                <td class="indent">{{ $account['code'] ? $account['code'] . ' - ' : '' }}{{ $account['name'] }}</td>
+                                <td class="text-right">{{ number_format($account['balance'], 2) }}</td>
+                            </tr>
+                            @endforeach
+                            <tr>
+                                <td class="section-total">Total {{ $group['group'] }}</td>
+                                <td class="section-total">{{ number_format($group['total'], 2) }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="2" style="text-align: center;">No expenses recorded.</td></tr>
+                        @endforelse
+
+                        @if($reportData['net_profit'] >= 0)
+                            <tr>
+                                <td class="font-bold" style="padding-top: 20px;">Net Profit</td>
+                                <td class="font-bold text-right text-green" style="padding-top: 20px;">{{ number_format($reportData['net_profit'], 2) }}</td>
+                            </tr>
+                        @endif
+                        <tr class="bg-light">
+                            <td class="font-bold" style="padding: 15px 8px;">TOTAL</td>
+                            @php $expenseSideTotal = $reportData['total_expenses'] + ($reportData['net_profit'] >= 0 ? $reportData['net_profit'] : 0); @endphp
+                            <td class="font-bold text-right" style="padding: 15px 8px;">{{ number_format($expenseSideTotal, 2) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+
+            <!-- RIGHT (REVENUE) -->
+            <td style="width: 50%; vertical-align: top; padding: 0; border: none;">
+                <table style="margin-top: 0; border-left: none;">
+                    <thead>
+                        <tr><th colspan="2" style="border-left: none;">Particulars (Revenue)</th></tr>
+                    </thead>
+                    <tbody>
+                        @forelse($reportData['revenue'] as $group)
+                            <tr><td colspan="2" class="group-header" style="border-left: none;">{{ $group['group'] }}</td></tr>
+                            @foreach($group['accounts'] as $account)
+                            <tr>
+                                <td class="indent" style="border-left: none;">{{ $account['code'] ? $account['code'] . ' - ' : '' }}{{ $account['name'] }}</td>
+                                <td class="text-right">{{ number_format($account['balance'], 2) }}</td>
+                            </tr>
+                            @endforeach
+                            <tr>
+                                <td class="section-total" style="border-left: none;">Total {{ $group['group'] }}</td>
+                                <td class="section-total">{{ number_format($group['total'], 2) }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="2" style="text-align: center; border-left: none;">No revenue recorded.</td></tr>
+                        @endforelse
+
+                        @if($reportData['net_profit'] < 0)
+                            <tr>
+                                <td class="font-bold" style="padding-top: 20px; border-left: none;">Net Loss</td>
+                                <td class="font-bold text-right text-red" style="padding-top: 20px;">{{ number_format(abs($reportData['net_profit']), 2) }}</td>
+                            </tr>
+                        @endif
+                        <tr class="bg-light">
+                            <td class="font-bold" style="padding: 15px 8px; border-left: none;">TOTAL</td>
+                            @php $revenueSideTotal = $reportData['total_revenue'] + ($reportData['net_profit'] < 0 ? abs($reportData['net_profit']) : 0); @endphp
+                            <td class="font-bold text-right" style="padding: 15px 8px;">{{ number_format($revenueSideTotal, 2) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </table>
+    @endif
 </body>
 </html>

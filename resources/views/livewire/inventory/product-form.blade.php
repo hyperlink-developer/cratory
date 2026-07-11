@@ -53,13 +53,13 @@
                             
                             <div>
                                 <label class="form-label">Unit of Measurement</label>
-                                <select wire:model="unit" class="form-input cursor-pointer">
-                                    <option value="nos">Numbers (nos)</option>
-                                    <option value="mts">Meters (mts)</option>
-                                    <option value="pcs">Pieces (pcs)</option>
-                                    <option value="hrs">Hours (hrs)</option>
+                                <select wire:model="unitOfMeasureId" class="form-input cursor-pointer">
+                                    <option value="">Select Unit</option>
+                                    @foreach($this->uoms as $uom)
+                                        <option value="{{ $uom->id }}">{{ $uom->name }} ({{ $uom->abbreviation }})</option>
+                                    @endforeach
                                 </select>
-                                @error('unit') <p class="mt-1.5 text-xs text-red-400">{{ $message }}</p> @enderror
+                                @error('unitOfMeasureId') <p class="mt-1.5 text-xs text-red-400">{{ $message }}</p> @enderror
                             </div>
                         </div>
 

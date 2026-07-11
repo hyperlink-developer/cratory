@@ -21,7 +21,7 @@ class Product extends Model
         'name',
         'sku',
         'description',
-        'unit',
+        'unit_of_measure_id',
         'hsn_code',
         'sac_code',
         'purchase_price',
@@ -52,6 +52,11 @@ class Product extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(ProductCategory::class, 'category_id');
+    }
+
+    public function unitOfMeasure(): BelongsTo
+    {
+        return $this->belongsTo(UnitOfMeasure::class);
     }
 
     public function taxRate(): BelongsTo

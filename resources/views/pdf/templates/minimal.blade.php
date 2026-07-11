@@ -3,7 +3,13 @@
 <head>
     <meta charset="utf-8">
     <title>Invoice {{ $invoice->invoice_number ?? 'Draft' }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
     <style>
+        html, body {
+            height: 100%;
+        }
         body {
             font-family: '{{ $template->font_choice ?? 'Helvetica' }}', sans-serif;
             color: #222;
@@ -138,11 +144,15 @@
     </style>
 </head>
 <body>
+@include('pdf.templates.partials.watermark')
+<table style="width: 100%; height: 100%; border: none; border-collapse: collapse;">
+    <tr>
+        <td style="vertical-align: top; border: none; padding: 0;">
     <div class="header">
         <table>
             <tr>
                 <td class="org-details" style="width: 50%;">
-                    <h2>{{ $organization->name }}</h2>
+                    @include('pdf.templates.partials.logo')
                     <p>{{ $organization->address_line_1 }} {{ $organization->address_line_2 }}</p>
                     <p>{{ $organization->city }} {{ $organization->state }} {{ $organization->pincode }}</p>
                     <p>{{ $organization->country }}</p>
@@ -205,12 +215,16 @@
                 @if((isset($template->show_fields['hsn']) ? $template->show_fields['hsn'] : true))
                     <th class="text-center">HSN/SAC</th>
                 @endif
+                @if(isset($template->show_fields['quantity']) ? $template->show_fields['quantity'] : true)
                 <th class="text-center">Qty</th>
+                @endif
+                @if(isset($template->show_fields['rate']) ? $template->show_fields['rate'] : true)
                 <th class="text-right">Rate</th>
+                @endif
                 @if(isset($template->show_fields['discount']) ? $template->show_fields['discount'] : true)
                     <th class="text-right">Discount</th>
                 @endif
-                @if((isset($template->show_fields['tax']) ? $template->show_fields['tax'] : true) && (!$organization->gst_number || !$organization->is_composition_tax_payer))
+                @if((isset($template->show_fields['tax_details']) ? $template->show_fields['tax_details'] : true) && (!$organization->gst_number || !$organization->is_composition_tax_payer))
                     <th class="text-right">Tax</th>
                 @endif
                 <th class="text-right">Amount</th>
@@ -228,8 +242,12 @@
                 @if((isset($template->show_fields['hsn']) ? $template->show_fields['hsn'] : true))
                     <td class="text-center">{{ $item->hsn_code ?? '-' }}</td>
                 @endif
+                @if(isset($template->show_fields['quantity']) ? $template->show_fields['quantity'] : true)
                 <td class="text-center">{{ $item->quantity + 0 }} {{ $item->unit }}</td>
+                @endif
+                @if(isset($template->show_fields['rate']) ? $template->show_fields['rate'] : true)
                 <td class="text-right">{{ number_format($item->rate, 2) }}</td>
+                @endif
                 @if(isset($template->show_fields['discount']) ? $template->show_fields['discount'] : true)
                 <td class="text-right">
                     @if($item->discount_amount > 0)
@@ -242,7 +260,7 @@
                     @endif
                 </td>
                 @endif
-                @if((isset($template->show_fields['tax']) ? $template->show_fields['tax'] : true) && (!$organization->gst_number || !$organization->is_composition_tax_payer))
+                @if((isset($template->show_fields['tax_details']) ? $template->show_fields['tax_details'] : true) && (!$organization->gst_number || !$organization->is_composition_tax_payer))
                 <td class="text-right">
                     @if($item->tax_amount > 0)
                         {{ number_format($item->tax_amount, 2) }}
@@ -292,21 +310,31 @@
         </div>
     @endif
 
-    <div style="clear: both; margin-top: 40px;">
-        @if($invoice->payment_info)
-            <div style="margin-bottom: 20px;">
-                <h4 style="margin: 0 0 5px 0; font-size: 13px; color: #666; text-transform: uppercase;">Payment Information</h4>
-                <p style="margin: 0; font-size: 12px; color: #333; white-space: pre-wrap;">{{ $invoice->payment_info }}</p>
-            </div>
-        @endif
+    <table style="width: 100%; margin-top: 40px; border: none; padding: 0 40px;">
+        <tr>
+            <td style="width: 65%; vertical-align: top; border: none; padding: 0;">
+                @if($invoice->payment_info)
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="margin: 0 0 5px 0; font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 1px;">Payment Information</h4>
+                        <p style="margin: 0; font-size: 11px; color: #333; white-space: pre-wrap;">{{ $invoice->payment_info }}</p>
+                    </div>
+                @endif
 
-        @if($invoice->terms_and_conditions)
-            <div>
-                <h4 style="margin: 0 0 5px 0; font-size: 13px; color: #666; text-transform: uppercase;">Terms & Conditions</h4>
-                <p style="margin: 0; font-size: 12px; color: #333; white-space: pre-wrap;">{{ $invoice->terms_and_conditions }}</p>
-            </div>
-        @endif
-    </div>
+                @if($invoice->terms_and_conditions)
+                    <div>
+                        <h4 style="margin: 0 0 5px 0; font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 1px;">Terms & Conditions</h4>
+                        <p style="margin: 0; font-size: 11px; color: #333; white-space: pre-wrap;">{{ $invoice->terms_and_conditions }}</p>
+                    </div>
+                @endif
+            </td>
+            <td style="width: 35%; vertical-align: bottom; text-align: center; border: none; padding: 0;">
+                @include('pdf.templates.partials.signature', ['align' => 'center'])
+                <div style="margin-top: 5px; padding-top: 5px; border-top: 1px solid #ccc; display: inline-block; min-width: 150px; font-weight: bold; font-size: 11px;">
+                    Authorised Signatory
+                </div>
+            </td>
+        </tr>
+    </table>
 
     <div class="footer">
         @if($template->footer_note)
@@ -315,5 +343,8 @@
             <p>Thank you.</p>
         @endif
     </div>
+        </td>
+    </tr>
+</table>
 </body>
 </html>

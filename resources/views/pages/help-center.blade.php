@@ -95,6 +95,22 @@
                         </div>
                     </button>
 
+                    <button @click="activeCategory = 'comprehensive-guide'; activeAccordion = null" 
+                            class="w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 text-left relative overflow-hidden group"
+                            :class="activeCategory === 'comprehensive-guide' ? 'bg-white/5 shadow-lg' : 'hover:bg-white/[0.02]'">
+                        <div class="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 transition-opacity duration-300" :class="{ 'opacity-100': activeCategory === 'comprehensive-guide' }"></div>
+                        <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-r-full transform origin-left transition-transform duration-300" :class="activeCategory === 'comprehensive-guide' ? 'scale-x-100' : 'scale-x-0'"></div>
+                        
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 relative z-10"
+                             :class="activeCategory === 'comprehensive-guide' ? 'bg-primary text-surface shadow-[0_0_20px_rgba(245,158,11,0.3)]' : 'bg-surface-lighter text-primary group-hover:bg-surface'">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                        </div>
+                        <div class="relative z-10">
+                            <h3 class="font-bold text-lg transition-colors" :class="activeCategory === 'comprehensive-guide' ? 'text-white' : 'text-text-primary group-hover:text-white'">Full User Guide</h3>
+                            <p class="text-xs text-text-muted mt-0.5">Complete onboarding & features</p>
+                        </div>
+                    </button>
+
                     <div class="pt-6 pb-4 text-center">
                         <p class="text-xs text-text-muted mb-4 uppercase tracking-wider font-semibold">Still need help?</p>
                         <a href="{{ route('contact-support') }}" class="inline-flex items-center justify-center gap-2 text-primary hover:text-primary-light transition-colors text-sm font-bold">
@@ -293,9 +309,56 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Comprehensive Guide Content -->
+                    <div x-show="(searchQuery === '' && activeCategory === 'comprehensive-guide') || (searchQuery !== '')" 
+                         class="space-y-4"
+                         x-transition.opacity>
+                        
+                        <div x-show="searchQuery === ''" class="mb-6">
+                            <h2 class="text-3xl font-extrabold text-white mb-2">Comprehensive User Guide</h2>
+                            <p class="text-text-muted text-lg">A complete walkthrough from onboarding to advanced features.</p>
+                        </div>
+                        <div x-show="searchQuery !== '' && (checkMatch('guide', 'guide') || checkMatch('onboarding', 'onboarding') || checkMatch('organization', 'organization'))" class="text-xs font-bold text-primary uppercase tracking-wider mb-2 mt-8">Comprehensive Guide</div>
+
+                        <div class="glass-card rounded-2xl border border-white/10 overflow-hidden" x-show="checkMatch('Comprehensive Guide', 'organization, contacts, products, inventory, sales, purchases, receipts, vouchers, ledger, reports')">
+                            <div class="p-8 prose prose-invert prose-primary max-w-none text-text-muted">
+                                <h3 class="text-white">1. Organization Management</h3>
+                                <p>Manage multiple businesses (organizations) from a single account. Switch between them using your avatar menu. Customize your organization's GST registered status, Composition Scheme status, and default currency in Settings.</p>
+                                
+                                <h3 class="text-white mt-6">2. Contacts (Customers & Vendors)</h3>
+                                <ul>
+                                    <li><strong>Customers:</strong> Used primarily for Sales Invoices and Receipts.</li>
+                                    <li><strong>Vendors:</strong> Used for Purchase Bills and Payment Vouchers.</li>
+                                </ul>
+
+                                <h3 class="text-white mt-6">3. Products & Inventory</h3>
+                                <p>For Products, Cratory tracks inventory automatically. Creating a Purchase Bill (marked "Received") increases stock, and sending a Sales Invoice decreases it.</p>
+
+                                <h3 class="text-white mt-6">4. Sales Invoices</h3>
+                                <ul>
+                                    <li><strong>Credit Invoices:</strong> Payment expected later. Can be tracked for outstanding balances.</li>
+                                    <li><strong>Cash Invoices:</strong> Immediate payments. Automatically creates a "Receipt" to mark the transaction as fully paid instantly.</li>
+                                </ul>
+
+                                <h3 class="text-white mt-6">5. Purchase Bills</h3>
+                                <p>Log your incoming goods and expenses. Drafts are work-in-progress, while "Received" finalizes the bill and triggers automated inventory addition.</p>
+
+                                <h3 class="text-white mt-6">6. Receipts & Payment Vouchers</h3>
+                                <p><strong>Receipts:</strong> Log incoming payments from Customers and allocate them across open Sales Invoices. <br>
+                                <strong>Payment Vouchers:</strong> Log outgoing payments to Vendors and allocate them across open Purchase Bills.</p>
+
+                                <h3 class="text-white mt-6">7. The Ledger & Accounting</h3>
+                                <p>Cratory features a fully automated Double-Entry Accounting system. Whenever a Sale, Purchase, Receipt, or Voucher is finalized, Cratory automatically generates the corresponding Journal Entries (Debits and Credits) to the correct Accounts.</p>
+
+                                <h3 class="text-white mt-6">8. Reports & Analytics</h3>
+                                <p>Powerful financial reports (Sales, Purchases, Profit & Loss, Trial Balance, Balance Sheet) that can be viewed on-screen or exported as PDF / CSV.</p>
+                            </div>
+                        </div>
+                    </div>
                     
                     <!-- Empty State -->
-                    <div x-show="searchQuery !== '' && !checkMatch('organization', 'organization') && !checkMatch('invoice', 'invoice') && !checkMatch('inventory', 'inventory') && !checkMatch('vendor', 'vendor') && !checkMatch('discount', 'discount') && !checkMatch('pays', 'pays')" class="text-center py-12" x-cloak>
+                    <div x-show="searchQuery !== '' && !checkMatch('organization', 'organization') && !checkMatch('invoice', 'invoice') && !checkMatch('inventory', 'inventory') && !checkMatch('vendor', 'vendor') && !checkMatch('discount', 'discount') && !checkMatch('pays', 'pays') && !checkMatch('guide', 'guide')" class="text-center py-12" x-cloak>
                         <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         </div>

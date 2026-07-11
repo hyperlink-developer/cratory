@@ -8,6 +8,7 @@ use Livewire\Component;
 class BalanceSheet extends Component
 {
     public $asOfDate;
+    public $layout = 'linear';
 
     public function mount()
     {

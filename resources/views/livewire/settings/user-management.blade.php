@@ -24,7 +24,7 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-white/5">
-                @foreach($users as $user)
+                @foreach($this->users as $user)
                     <tr class="hover:bg-white/[0.02] transition-colors">
                         <td class="p-4">
                             <div class="flex items-center gap-3">
@@ -69,7 +69,7 @@
 
     <!-- Mobile View: Cards -->
     <div class="md:hidden space-y-4">
-        @foreach($users as $user)
+        @foreach($this->users as $user)
             <div class="glass-card p-4 rounded-xl border border-white/5 flex flex-col gap-4">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
@@ -114,29 +114,31 @@
             <form wire:submit.prevent="saveUser" class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-text-muted mb-1">Name</label>
-                    <input type="text" wire:model="name" class="input w-full" required>
+                    <input type="text" wire:model="name" class="form-input w-full" required>
                     @error('name') <span class="text-red-400 text-xs mt-1 block">{{ $message }}</span> @enderror
                 </div>
                 
                 <div>
                     <label class="block text-sm font-medium text-text-muted mb-1">Email</label>
-                    <input type="email" wire:model="email" class="input w-full" required>
+                    <input type="email" wire:model="email" class="form-input w-full" required>
                     @error('email') <span class="text-red-400 text-xs mt-1 block">{{ $message }}</span> @enderror
                 </div>
                 
                 @if(!$editMode)
                 <div>
                     <label class="block text-sm font-medium text-text-muted mb-1">Password (Optional)</label>
-                    <input type="password" wire:model="password" class="input w-full" placeholder="Leave blank for 'password'">
+                    <input type="password" wire:model="password" class="form-input w-full" placeholder="Leave blank for 'password'">
                     @error('password') <span class="text-red-400 text-xs mt-1 block">{{ $message }}</span> @enderror
                 </div>
                 @endif
                 
                 <div>
                     <label class="block text-sm font-medium text-text-muted mb-1">Role</label>
-                    <select wire:model="role" class="input w-full" required>
+                    <select wire:model="role" class="form-input w-full" required>
                         @foreach(App\Enums\OrgUserRole::cases() as $r)
-                            <option value="{{ $r->value }}">{{ $r->label() }}</option>
+                            @if($r->value !== 'commander')
+                                <option class="bg-gray-900 text-white" value="{{ $r->value }}">{{ $r->label() }}</option>
+                            @endif
                         @endforeach
                     </select>
                     @error('role') <span class="text-red-400 text-xs mt-1 block">{{ $message }}</span> @enderror

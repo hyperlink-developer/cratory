@@ -38,9 +38,9 @@
             <div>
                 <label for="orgType" class="form-label">Business type <span class="text-red-400">*</span></label>
                 <select wire:model="orgType" id="orgType" class="form-input cursor-pointer">
-                    <option value="">Select type</option>
+                    <option class="bg-gray-900 text-white" value="">Select type</option>
                     @foreach($this->organizationTypes as $type)
-                        <option value="{{ $type['value'] }}">{{ $type['label'] }}</option>
+                        <option class="bg-gray-900 text-white" value="{{ $type['value'] }}">{{ $type['label'] }}</option>
                     @endforeach
                 </select>
                 @error('orgType') <p class="mt-1.5 text-xs text-red-400">{{ $message }}</p> @enderror
@@ -52,7 +52,7 @@
                     @foreach($this->businessCategories as $cat)
                         <label class="relative flex items-center justify-center p-4 rounded-xl border cursor-pointer transition-all duration-200
                             {{ $businessCategory === $cat['value'] ? 'border-accent bg-accent/10 text-accent' : 'border-border hover:border-border-light text-text-secondary' }}">
-                            <input type="radio" wire:model="businessCategory" value="{{ $cat['value'] }}" class="sr-only">
+                            <input type="radio" wire:model.live="businessCategory" value="{{ $cat['value'] }}" class="sr-only">
                             <span class="text-sm font-medium">{{ $cat['label'] }}</span>
                         </label>
                     @endforeach

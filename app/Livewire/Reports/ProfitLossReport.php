@@ -10,6 +10,7 @@ class ProfitLossReport extends Component
 {
     public $startDate;
     public $endDate;
+    public $layout = 'linear';
 
     public function mount()
     {

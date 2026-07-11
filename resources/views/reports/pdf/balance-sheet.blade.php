@@ -37,6 +37,7 @@
     </div>
     @endif
 
+    @if($layout === 'linear')
     <table>
         <!-- ASSETS -->
         <thead>
@@ -134,5 +135,86 @@
             </tr>
         </tbody>
     </table>
+    @else
+    <table style="border: none; margin-top: 0;">
+        <tr>
+            <!-- LEFT (LIABILITIES & EQUITY) -->
+            <td style="width: 50%; vertical-align: top; padding: 0; border: none; border-right: 1px solid #ddd;">
+                <table style="margin-top: 0;">
+                    <thead>
+                        <tr><th colspan="2">Liabilities & Equity</th></tr>
+                    </thead>
+                    <tbody>
+                        @forelse($reportData['liabilities'] as $group)
+                            <tr><td colspan="2" class="group-header">{{ $group['group'] }}</td></tr>
+                            @foreach($group['accounts'] as $account)
+                            <tr>
+                                <td class="indent">{{ $account['code'] ? $account['code'] . ' - ' : '' }}{{ $account['name'] }}</td>
+                                <td class="text-right">{{ number_format($account['balance'], 2) }}</td>
+                            </tr>
+                            @endforeach
+                            <tr>
+                                <td class="section-total">Total {{ $group['group'] }}</td>
+                                <td class="section-total">{{ number_format($group['total'], 2) }}</td>
+                            </tr>
+                        @empty
+                        @endforelse
+
+                        @forelse($reportData['equity'] as $group)
+                            <tr><td colspan="2" class="group-header">{{ $group['group'] }}</td></tr>
+                            @foreach($group['accounts'] as $account)
+                            <tr>
+                                <td class="indent">{{ $account['code'] ? $account['code'] . ' - ' : '' }}{{ $account['name'] }}</td>
+                                <td class="text-right">{{ number_format($account['balance'], 2) }}</td>
+                            </tr>
+                            @endforeach
+                            <tr>
+                                <td class="section-total">Total {{ $group['group'] }}</td>
+                                <td class="section-total">{{ number_format($group['total'], 2) }}</td>
+                            </tr>
+                        @empty
+                        @endforelse
+
+                        <tr class="final-total">
+                            <td style="padding: 15px 8px;">TOTAL L & E</td>
+                            <td class="text-right {{ $reportData['is_balanced'] ? 'text-green' : 'text-red' }}" style="padding: 15px 8px;">{{ number_format($reportData['total_liabilities_and_equity'], 2) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+
+            <!-- RIGHT (ASSETS) -->
+            <td style="width: 50%; vertical-align: top; padding: 0; border: none;">
+                <table style="margin-top: 0; border-left: none;">
+                    <thead>
+                        <tr><th colspan="2" style="border-left: none;">Assets</th></tr>
+                    </thead>
+                    <tbody>
+                        @forelse($reportData['assets'] as $group)
+                            <tr><td colspan="2" class="group-header" style="border-left: none;">{{ $group['group'] }}</td></tr>
+                            @foreach($group['accounts'] as $account)
+                            <tr>
+                                <td class="indent" style="border-left: none;">{{ $account['code'] ? $account['code'] . ' - ' : '' }}{{ $account['name'] }}</td>
+                                <td class="text-right">{{ number_format($account['balance'], 2) }}</td>
+                            </tr>
+                            @endforeach
+                            <tr>
+                                <td class="section-total" style="border-left: none;">Total {{ $group['group'] }}</td>
+                                <td class="section-total">{{ number_format($group['total'], 2) }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="2" style="text-align: center; border-left: none;">No assets recorded.</td></tr>
+                        @endforelse
+
+                        <tr class="final-total">
+                            <td style="padding: 15px 8px; border-left: none;">TOTAL ASSETS</td>
+                            <td class="text-right text-green" style="padding: 15px 8px;">{{ number_format($reportData['total_assets'], 2) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </table>
+    @endif
 </body>
 </html>

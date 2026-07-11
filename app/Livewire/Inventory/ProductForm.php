@@ -6,6 +6,7 @@ use App\Enums\ItemType;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\TaxRate;
+use App\Models\UnitOfMeasure;
 use Livewire\Component;
 
 class ProductForm extends Component
@@ -16,7 +17,7 @@ class ProductForm extends Component
     public string $name = '';
     public string $sku = '';
     public string $description = '';
-    public string $unit = 'pcs';
+    public ?int $unitOfMeasureId = null;
     public ?int $categoryId = null;
     
     public string $hsnCode = '';
@@ -43,7 +44,7 @@ class ProductForm extends Component
             $this->name = $product->name;
             $this->sku = $product->sku ?? '';
             $this->description = $product->description ?? '';
-            $this->unit = $product->unit ?? 'pcs';
+            $this->unitOfMeasureId = $product->unit_of_measure_id;
             $this->categoryId = $product->category_id;
             
             $this->hsnCode = $product->hsn_code ?? '';
@@ -70,7 +71,7 @@ class ProductForm extends Component
             
             'sellingPrice' => 'required|numeric|min:0',
             'purchasePrice' => 'required|numeric|min:0',
-            'unit' => 'nullable|string|max:50',
+            'unitOfMeasureId' => 'nullable|exists:unit_of_measures,id',
         ];
 
         if ($this->itemType === 'product') {
@@ -113,7 +114,7 @@ class ProductForm extends Component
             'selling_price' => $this->sellingPrice,
             'purchase_price' => $this->purchasePrice,
             'tax_rate_id' => $this->taxRateId,
-            'unit' => $this->unit ?: ($this->itemType === 'product' ? 'pcs' : 'hrs'),
+            'unit_of_measure_id' => $this->unitOfMeasureId,
         ];
 
         if ($this->itemType === 'product') {
@@ -153,6 +154,11 @@ class ProductForm extends Component
     public function getTaxRatesProperty()
     {
         return TaxRate::active()->orderBy('percentage')->get();
+    }
+    
+    public function getUomsProperty()
+    {
+        return UnitOfMeasure::active()->orderBy('name')->get();
     }
     
     public function getItemTypesProperty()

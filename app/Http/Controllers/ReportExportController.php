@@ -248,11 +248,14 @@ class ReportExportController extends Controller
             'net_profit' => $netProfit,
         ];
 
+        $layout = $request->query('layout', 'linear');
+
         $pdf = Pdf::loadView('reports.pdf.profit-loss', [
             'reportData' => $reportData,
             'startDate' => $startDate,
             'endDate' => $endDate,
-            'org' => auth()->user()->currentOrganization
+            'org' => auth()->user()->currentOrganization,
+            'layout' => $layout
         ]);
 
         return $pdf->download('Profit_Loss_Report.pdf');
@@ -512,10 +515,13 @@ class ReportExportController extends Controller
             'is_balanced' => round($totalAssets, 2) === round($totalLiabilitiesAndEquity, 2),
         ];
 
+        $layout = $request->query('layout', 'linear');
+
         $pdf = Pdf::loadView('reports.pdf.balance-sheet', [
             'reportData' => $reportData,
             'asOfDate' => $asOfDate,
-            'org' => auth()->user()->currentOrganization
+            'org' => auth()->user()->currentOrganization,
+            'layout' => $layout
         ]);
 
         return $pdf->download('Balance_Sheet.pdf');
