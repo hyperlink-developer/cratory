@@ -22,12 +22,17 @@ class Dashboard extends Component
 
     private function getPeriodDates(): array
     {
+        $now = Carbon::now();
+        
         return match ($this->period) {
-            'week' => [Carbon::now()->subDays(7), Carbon::now()],
-            'month' => [Carbon::now()->subDays(30), Carbon::now()],
-            'quarter' => [Carbon::now()->subDays(90), Carbon::now()],
-            'year' => [Carbon::now()->subDays(365), Carbon::now()],
-            default => [Carbon::now()->startOfMonth(), Carbon::now()],
+            'week' => [$now->copy()->subDays(7)->startOfDay(), $now->copy()->endOfDay()],
+            'month' => [$now->copy()->startOfMonth(), $now->copy()->endOfMonth()],
+            'quarter' => [$now->copy()->firstOfQuarter()->startOfDay(), $now->copy()->lastOfQuarter()->endOfDay()],
+            'year' => [
+                Carbon::create($now->month >= 4 ? $now->year : $now->year - 1, 4, 1)->startOfDay(),
+                Carbon::create($now->month >= 4 ? $now->year + 1 : $now->year, 3, 31)->endOfDay(),
+            ],
+            default => [$now->copy()->startOfMonth(), $now->copy()->endOfMonth()],
         };
     }
 

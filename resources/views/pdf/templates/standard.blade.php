@@ -3,6 +3,9 @@
 <head>
     <meta charset="utf-8">
     <title>Invoice {{ $invoice->invoice_number ?? 'Draft' }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: '{{ $template->font_choice ?? 'Helvetica' }}', sans-serif;
@@ -308,21 +311,31 @@
         </div>
     @endif
 
-    <div style="clear: both; margin-top: 40px;">
-        @if($invoice->payment_info)
-            <div style="margin-bottom: 20px;">
-                <h4 style="margin: 0 0 5px 0; font-size: 13px; color: #666; text-transform: uppercase;">Payment Information</h4>
-                <p style="margin: 0; font-size: 12px; color: #333; white-space: pre-wrap;">{{ $invoice->payment_info }}</p>
-            </div>
-        @endif
+    <table style="width: 100%; margin-top: 40px; border: none;">
+        <tr>
+            <td style="width: 65%; vertical-align: top; border: none; padding: 0;">
+                @if($invoice->payment_info)
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="margin: 0 0 5px 0; font-size: 13px; color: #666; text-transform: uppercase;">Payment Information</h4>
+                        <p style="margin: 0; font-size: 12px; color: #333; white-space: pre-wrap;">{{ $invoice->payment_info }}</p>
+                    </div>
+                @endif
 
-        @if($invoice->terms_and_conditions)
-            <div>
-                <h4 style="margin: 0 0 5px 0; font-size: 13px; color: #666; text-transform: uppercase;">Terms & Conditions</h4>
-                <p style="margin: 0; font-size: 12px; color: #333; white-space: pre-wrap;">{{ $invoice->terms_and_conditions }}</p>
-            </div>
-        @endif
-    </div>
+                @if($invoice->terms_and_conditions)
+                    <div>
+                        <h4 style="margin: 0 0 5px 0; font-size: 13px; color: #666; text-transform: uppercase;">Terms & Conditions</h4>
+                        <p style="margin: 0; font-size: 12px; color: #333; white-space: pre-wrap;">{{ $invoice->terms_and_conditions }}</p>
+                    </div>
+                @endif
+            </td>
+            <td style="width: 35%; vertical-align: bottom; text-align: center; border: none; padding: 0;">
+                @include('pdf.templates.partials.signature', ['align' => 'center'])
+                <div style="margin-top: 5px; padding-top: 5px; border-top: 1px solid #ccc; display: inline-block; min-width: 150px; font-weight: bold;">
+                    Authorised Signatory
+                </div>
+            </td>
+        </tr>
+    </table>
 
     <div class="footer">
         @if($template->footer_note)
@@ -330,7 +343,6 @@
         @else
             <p>Thank you for your business!</p>
         @endif
-        <p>This is a computer generated invoice and requires no signature.</p>
     </div>
 </body>
 </html>

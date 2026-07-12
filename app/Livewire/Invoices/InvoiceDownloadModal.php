@@ -52,10 +52,9 @@ class InvoiceDownloadModal extends Component
 
         $url = route('invoices.pdf', $this->invoice->uuid) . '?' . $queryParams;
         
-        // Dispatch browser event to open in new tab
-        $this->dispatch('open-url-new-tab', url: $url);
-        
         $this->closeModal();
+        
+        $this->redirect($url);
     }
 
     public function updatedTemplateId($value)

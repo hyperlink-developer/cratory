@@ -5,7 +5,7 @@
             <p class="text-sm text-text-muted mt-1">Snapshot of your organization's financial position at a specific point in time.</p>
         </div>
         <div class="flex gap-2">
-            <a href="{{ route('reports.balance-sheet.pdf', ['date' => $asOfDate]) }}" target="_blank" class="btn btn-primary">
+            <a href="{{ route('reports.balance-sheet.pdf', ['date' => $asOfDate, 'layout' => $layout]) }}" target="_blank" class="btn btn-primary">
                 <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
@@ -19,6 +19,13 @@
         <div>
             <label class="block text-sm font-medium text-text-secondary mb-1">As of Date</label>
             <input type="date" wire:model.live="asOfDate" class="form-input">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-text-secondary mb-1">Layout</label>
+            <select wire:model.live="layout" class="form-input bg-surface text-text-primary">
+                <option value="linear">Linear (Vertical)</option>
+                <option value="t-shape">T-Shape (Horizontal)</option>
+            </select>
         </div>
     </div>
 
@@ -41,9 +48,9 @@
             <p class="text-xs text-text-muted">As of {{ \Carbon\Carbon::parse($asOfDate)->format('M d, Y') }}</p>
         </div>
 
-        <div class="p-0">
+        <div class="p-0 overflow-x-auto">
+            @if($layout === 'linear')
             <table class="w-full text-sm">
-                
                 <!-- ASSETS SECTION -->
                 <thead>
                     <tr class="bg-white/5 border-b border-white/5">
@@ -156,6 +163,76 @@
                     </tr>
                 </tfoot>
             </table>
+            @else
+            <!-- T-SHAPE LAYOUT -->
+            <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/10 text-sm">
+                <!-- LEFT SIDE (LIABILITIES & EQUITY) -->
+                <div>
+                    <div class="bg-white/5 py-3 px-6 font-semibold text-text-primary uppercase tracking-wider border-b border-white/5">Liabilities & Equity</div>
+                    <div class="divide-y divide-white/5 min-h-[400px]">
+                        @forelse($reportData['liabilities'] as $group)
+                            <div class="py-2 px-6 font-medium text-text-secondary pt-4">{{ $group['group'] }}</div>
+                            @foreach($group['accounts'] as $account)
+                            <div class="flex justify-between hover:bg-white/5 py-2 px-6">
+                                <span class="text-text-muted pl-4">{{ $account['code'] ? $account['code'] . ' - ' : '' }}{{ $account['name'] }}</span>
+                                <span class="text-text-primary">₹{{ number_format($account['balance'], 2) }}</span>
+                            </div>
+                            @endforeach
+                            <div class="flex justify-between py-2 px-6 text-text-secondary border-t border-white/10 border-dashed">
+                                <span>Total {{ $group['group'] }}</span>
+                                <span>₹{{ number_format($group['total'], 2) }}</span>
+                            </div>
+                        @empty
+                        @endforelse
+
+                        @forelse($reportData['equity'] as $group)
+                            <div class="py-2 px-6 font-medium text-text-secondary pt-4">{{ $group['group'] }}</div>
+                            @foreach($group['accounts'] as $account)
+                            <div class="flex justify-between hover:bg-white/5 py-2 px-6">
+                                <span class="text-text-muted pl-4">{{ $account['code'] ? $account['code'] . ' - ' : '' }}{{ $account['name'] }}</span>
+                                <span class="text-text-primary">₹{{ number_format($account['balance'], 2) }}</span>
+                            </div>
+                            @endforeach
+                            <div class="flex justify-between py-2 px-6 text-text-secondary border-t border-white/10 border-dashed">
+                                <span>Total {{ $group['group'] }}</span>
+                                <span>₹{{ number_format($group['total'], 2) }}</span>
+                            </div>
+                        @empty
+                        @endforelse
+                    </div>
+                    <div class="flex justify-between py-4 px-6 font-bold text-text-primary uppercase bg-white/5 border-t border-white/10">
+                        <span>Total Liabilities & Equity</span>
+                        <span class="{{ $reportData['is_balanced'] ? 'text-green-400' : 'text-red-400' }}">₹{{ number_format($reportData['total_liabilities_and_equity'], 2) }}</span>
+                    </div>
+                </div>
+
+                <!-- RIGHT SIDE (ASSETS) -->
+                <div>
+                    <div class="bg-white/5 py-3 px-6 font-semibold text-text-primary uppercase tracking-wider border-b border-white/5">Assets</div>
+                    <div class="divide-y divide-white/5 min-h-[400px]">
+                        @forelse($reportData['assets'] as $group)
+                            <div class="py-2 px-6 font-medium text-text-secondary pt-4">{{ $group['group'] }}</div>
+                            @foreach($group['accounts'] as $account)
+                            <div class="flex justify-between hover:bg-white/5 py-2 px-6">
+                                <span class="text-text-muted pl-4">{{ $account['code'] ? $account['code'] . ' - ' : '' }}{{ $account['name'] }}</span>
+                                <span class="text-text-primary">₹{{ number_format($account['balance'], 2) }}</span>
+                            </div>
+                            @endforeach
+                            <div class="flex justify-between py-2 px-6 text-text-secondary border-t border-white/10 border-dashed">
+                                <span>Total {{ $group['group'] }}</span>
+                                <span>₹{{ number_format($group['total'], 2) }}</span>
+                            </div>
+                        @empty
+                            <div class="py-4 px-6 text-center text-text-muted">No assets recorded.</div>
+                        @endforelse
+                    </div>
+                    <div class="flex justify-between py-4 px-6 font-bold text-text-primary uppercase bg-white/5 border-t border-white/10">
+                        <span>Total Assets</span>
+                        <span class="text-green-400">₹{{ number_format($reportData['total_assets'], 2) }}</span>
+                    </div>
+                </div>
+            </div>
+            @endif
         </div>
     </div>
 </div>

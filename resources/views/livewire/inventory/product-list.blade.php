@@ -173,7 +173,7 @@
                                         <span class="font-bold text-sm {{ $product->isLowStock() ? 'text-red-400' : 'text-text-primary' }}">
                                             {{ $product->current_stock + 0 }}
                                         </span>
-                                        <span class="text-[0.65rem] text-text-muted uppercase tracking-wider">{{ $product->unit ?? 'Units' }}</span>
+                                        <span class="text-[0.65rem] text-text-muted uppercase tracking-wider">{{ $product->unitOfMeasure->abbreviation ?? 'UNITS' }}</span>
                                     </div>
                                 @else
                                     <span class="text-text-muted text-xs">—</span>

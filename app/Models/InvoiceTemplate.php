@@ -24,6 +24,13 @@ class InvoiceTemplate extends Model
         'default_payment_info',
         'default_terms_and_conditions',
         'font_choice',
+        'watermark_type',
+        'watermark_text',
+        'watermark_image_path',
+        'show_logo',
+        'signature_type',
+        'signature_text',
+        'signature_image_path',
     ];
 
     protected function casts(): array
@@ -38,7 +45,10 @@ class InvoiceTemplate extends Model
     {
         return [
             'hsn' => true,
+            'quantity' => true,
+            'rate' => true,
             'discount' => true,
+            'tax_details' => true,
             'shipping_address' => true,
             'notes' => true,
             'terms' => true,

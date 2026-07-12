@@ -140,7 +140,11 @@
                                     </div>
                                     <div>
                                         <p class="font-medium text-text-primary">{{ $invoice->invoice_number ?? 'Draft' }}</p>
-                                        <p class="text-xs text-text-muted">Due: {{ $invoice->due_date ? $invoice->due_date->format('d M, Y') : '-' }}</p>
+                                        @if($invoice->invoice_basis === \App\Enums\InvoiceBasis::Cash)
+                                            <p class="text-xs text-text-muted">Cash</p>
+                                        @else
+                                            <p class="text-xs text-text-muted">Due: {{ $invoice->due_date ? $invoice->due_date->format('d M, Y') : '-' }}</p>
+                                        @endif
                                     </div>
                                 </div>
                             </td>

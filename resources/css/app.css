@@ -156,6 +156,11 @@ body {
         background-size: 1.25em 1.25em;
         padding-right: 2.5rem;
     }
+
+    select.form-input option {
+        background-color: #0F172A;
+        color: var(--color-text-primary);
+    }
 }
 
 input[type="date"].form-input::-webkit-calendar-picker-indicator {

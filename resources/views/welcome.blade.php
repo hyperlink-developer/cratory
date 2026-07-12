@@ -49,7 +49,7 @@
                     @else
                         <a href="{{ route('login') }}" class="hidden sm:block text-sm font-semibold text-text-secondary hover:text-white transition-colors">Log in</a>
                         @if (Route::has('register'))
-                            <a href="{{ route('register') }}" class="btn bg-gradient-to-r from-primary to-accent hover:from-primary-light hover:to-accent-light text-white shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:shadow-[0_0_30px_rgba(245,158,11,0.5)] border-0 transition-all duration-300 transform hover:-translate-y-0.5 rounded-xl">Start Free Trial</a>
+                            <a href="{{ route('register') }}" class="btn bg-gradient-to-r from-primary to-accent hover:from-primary-light hover:to-accent-light text-white shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:shadow-[0_0_30px_rgba(245,158,11,0.5)] border-0 transition-all duration-300 transform hover:-translate-y-0.5 rounded-xl">Get Started - Free</a>
                         @endif
                     @endauth
                 </div>
@@ -87,7 +87,7 @@
                 @else
                     @if (Route::has('register'))
                         <a href="{{ route('register') }}" class="btn bg-gradient-to-r from-primary to-accent hover:from-primary-light hover:to-accent-light text-white w-full sm:w-auto px-8 py-4 text-lg rounded-xl shadow-[0_0_30px_rgba(245,158,11,0.3)] hover:shadow-[0_0_40px_rgba(245,158,11,0.5)] border-0 transition-all duration-300 transform hover:-translate-y-1 font-bold">
-                            Start 14-Day Free Trial
+                            Create Free Account
                         </a>
                     @endif
                     <a href="#demo" class="btn glass-card w-full sm:w-auto px-8 py-4 text-lg hover:bg-white/10 transition-colors border-white/10 rounded-xl font-medium group">
@@ -221,70 +221,42 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-20">
                 <h2 class="text-primary font-semibold tracking-wide uppercase text-sm mb-3">Pricing</h2>
-                <h3 class="text-4xl md:text-5xl font-bold text-white mb-6">Simple, transparent pricing</h3>
-                <p class="text-xl text-text-muted max-w-2xl mx-auto">Start for free, upgrade when you need more power. No hidden fees.</p>
+                <h3 class="text-4xl md:text-5xl font-bold text-white mb-6">100% Free. No Subscriptions.</h3>
+                <p class="text-xl text-text-muted max-w-2xl mx-auto">We believe in empowering small businesses. Get full access to all features without paying a dime.</p>
             </div>
             
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto lg:items-center">
-                <!-- Free Plan -->
-                <div class="glass-card p-10 rounded-3xl border border-white/5 flex flex-col hover:border-white/10 transition-colors">
-                    <h4 class="text-2xl font-bold text-white mb-2">Starter</h4>
-                    <p class="text-text-muted mb-8">Perfect for freelancers and side-projects.</p>
-                    <div class="mb-8 flex items-baseline">
-                        <span class="text-5xl font-extrabold text-white">$0</span>
+            <div class="max-w-3xl mx-auto">
+                <div class="glass-card p-10 rounded-3xl border-2 border-primary relative flex flex-col shadow-[0_0_40px_rgba(245,158,11,0.15)] bg-gradient-to-b from-surface to-surface-light z-10 text-center">
+                    <div class="absolute -top-4 inset-x-0 flex justify-center">
+                        <span class="bg-gradient-to-r from-primary to-accent text-white text-xs font-bold uppercase tracking-wider py-1.5 px-4 rounded-full shadow-lg">Completely Free</span>
+                    </div>
+                    <h4 class="text-3xl font-bold text-white mb-4">Everything Included</h4>
+                    <p class="text-text-muted mb-8 text-lg">Manage your business operations properly, with zero cost.</p>
+                    <div class="mb-8 flex items-baseline justify-center">
+                        <span class="text-6xl font-extrabold text-white">$0</span>
                         <span class="text-text-muted ml-2">/ forever</span>
                     </div>
-                    <ul class="space-y-4 mb-10 flex-grow">
-                        <li class="flex items-center gap-3 text-text-primary">
-                            <div class="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-primary"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
-                            Up to 50 Invoices/month
-                        </li>
-                        <li class="flex items-center gap-3 text-text-primary">
-                            <div class="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-primary"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
-                            Basic Inventory tracking
-                        </li>
-                        <li class="flex items-center gap-3 text-text-primary">
-                            <div class="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-primary"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
-                            1 User Account
-                        </li>
-                        <li class="flex items-center gap-3 text-text-muted opacity-50">
-                            <div class="w-5 h-5 rounded-full bg-surface-lighter flex items-center justify-center text-text-muted"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg></div>
-                            Priority 24/7 Support
-                        </li>
-                    </ul>
-                    <a href="{{ route('register') }}" class="btn w-full bg-surface-lighter hover:bg-white/10 text-white py-4 border border-white/10 rounded-xl text-lg font-medium transition-all">Get Started Free</a>
-                </div>
-
-                <!-- Pro Plan -->
-                <div class="glass-card p-10 rounded-3xl border-2 border-primary relative flex flex-col shadow-[0_0_40px_rgba(245,158,11,0.15)] transform lg:scale-105 bg-gradient-to-b from-surface to-surface-light z-10">
-                    <div class="absolute -top-4 inset-x-0 flex justify-center">
-                        <span class="bg-gradient-to-r from-primary to-accent text-white text-xs font-bold uppercase tracking-wider py-1.5 px-4 rounded-full shadow-lg">Most Popular</span>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left mb-10 max-w-xl mx-auto">
+                        <div class="flex items-center gap-3 text-white font-medium">
+                            <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-surface shrink-0"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+                            Unlimited Invoices & Bills
+                        </div>
+                        <div class="flex items-center gap-3 text-white font-medium">
+                            <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-surface shrink-0"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+                            Real-time Inventory Tracking
+                        </div>
+                        <div class="flex items-center gap-3 text-white font-medium">
+                            <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-surface shrink-0"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+                            Automated Accounting
+                        </div>
+                        <div class="flex items-center gap-3 text-white font-medium">
+                            <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-surface shrink-0"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+                            Advanced Financial Reports
+                        </div>
                     </div>
-                    <h4 class="text-2xl font-bold text-white mb-2">Business Pro</h4>
-                    <p class="text-text-muted mb-8">Advanced features for growing businesses.</p>
-                    <div class="mb-8 flex items-baseline">
-                        <span class="text-5xl font-extrabold text-white">$29</span>
-                        <span class="text-text-muted ml-2">/ month</span>
-                    </div>
-                    <ul class="space-y-4 mb-10 flex-grow">
-                        <li class="flex items-center gap-3 text-white font-medium">
-                            <div class="w-5 h-5 rounded-full bg-primary flex items-center justify-center text-surface"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
-                            Unlimited Invoices
-                        </li>
-                        <li class="flex items-center gap-3 text-white font-medium">
-                            <div class="w-5 h-5 rounded-full bg-primary flex items-center justify-center text-surface"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
-                            Multi-location Inventory
-                        </li>
-                        <li class="flex items-center gap-3 text-white font-medium">
-                            <div class="w-5 h-5 rounded-full bg-primary flex items-center justify-center text-surface"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
-                            Unlimited User Accounts
-                        </li>
-                        <li class="flex items-center gap-3 text-white font-medium">
-                            <div class="w-5 h-5 rounded-full bg-primary flex items-center justify-center text-surface"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
-                            Priority 24/7 Support
-                        </li>
-                    </ul>
-                    <a href="{{ route('register') }}" class="btn bg-gradient-to-r from-primary to-accent hover:from-primary-light hover:to-accent-light text-white w-full py-4 rounded-xl text-lg font-bold shadow-[0_0_20px_rgba(245,158,11,0.4)] hover:shadow-[0_0_30px_rgba(245,158,11,0.6)] border-0 transition-all transform hover:-translate-y-1">Start 14-Day Free Trial</a>
+                    
+                    <a href="{{ route('register') }}" class="btn bg-gradient-to-r from-primary to-accent hover:from-primary-light hover:to-accent-light text-white w-full py-4 rounded-xl text-xl font-bold shadow-[0_0_20px_rgba(245,158,11,0.4)] hover:shadow-[0_0_30px_rgba(245,158,11,0.6)] border-0 transition-all transform hover:-translate-y-1">Create Your Free Account</a>
                 </div>
             </div>
         </div>

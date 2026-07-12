@@ -11,14 +11,11 @@ class DocumentNumberGenerator
 {
     /**
      * Generate a gap-free, race-safe document number.
-     *
-     * Format: {ORG_PREFIX}-{DOC_TYPE_CODE}-{FY}-{SEQUENCE}
-     * Example: CRT-INV-2526-0001
      */
     public function generate(Organization $organization, string $documentType): string
     {
         $financialYear = $this->getFinancialYear($organization);
-        $prefix = $organization->invoice_prefix;
+        [$prefix, $format] = $this->getFormatConfig($organization, $documentType);
 
         $nextNumber = DB::transaction(function () use ($organization, $documentType, $financialYear) {
             $sequence = DocumentSequence::withoutGlobalScopes()
@@ -47,13 +44,7 @@ class DocumentNumberGenerator
             return $sequence->last_number;
         });
 
-        return sprintf(
-            '%s-%s-%s-%04d',
-            $prefix,
-            $documentType,
-            $financialYear,
-            $nextNumber
-        );
+        return $this->formatNumber($format, $prefix, $documentType, $financialYear, $nextNumber);
     }
 
     /**
@@ -62,7 +53,7 @@ class DocumentNumberGenerator
     public function peek(Organization $organization, string $documentType): string
     {
         $financialYear = $this->getFinancialYear($organization);
-        $prefix = $organization->invoice_prefix;
+        [$prefix, $format] = $this->getFormatConfig($organization, $documentType);
 
         $sequence = DocumentSequence::withoutGlobalScopes()
             ->where('organization_id', $organization->id)
@@ -72,13 +63,38 @@ class DocumentNumberGenerator
 
         $nextNumber = $sequence ? $sequence->last_number + 1 : 1;
 
-        return sprintf(
-            '%s-%s-%s-%04d',
-            $prefix,
-            $documentType,
-            $financialYear,
-            $nextNumber
-        );
+        return $this->formatNumber($format, $prefix, $documentType, $financialYear, $nextNumber);
+    }
+
+    private function getFormatConfig(Organization $organization, string $documentType): array
+    {
+        $settings = $organization->document_settings ?? [];
+        $typeKey = 'invoice';
+        if ($documentType === 'REC') $typeKey = 'receipt';
+        elseif ($documentType === 'PAY') $typeKey = 'voucher';
+        
+        $typeSettings = $settings[$typeKey] ?? [];
+        
+        $defaultPrefix = $organization->invoice_prefix;
+        if ($documentType === 'REC') $defaultPrefix = 'REC';
+        elseif ($documentType === 'PAY') $defaultPrefix = 'PAY';
+
+        $prefix = $typeSettings['prefix'] ?? $defaultPrefix;
+        $format = $typeSettings['format'] ?? '{PREFIX}-{DOC_TYPE}-{FY}-{SEQ}';
+        
+        return [$prefix, $format];
+    }
+
+    private function formatNumber(string $format, string $prefix, string $documentType, string $financialYear, int $sequence): string
+    {
+        $replacements = [
+            '{PREFIX}' => $prefix,
+            '{DOC_TYPE}' => $documentType,
+            '{FY}' => $financialYear,
+            '{SEQ}' => sprintf('%04d', $sequence),
+        ];
+
+        return strtr($format, $replacements);
     }
 
     /**

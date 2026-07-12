@@ -160,7 +160,9 @@
                 <div x-show="open" x-collapse>
                     <div class="py-1 pl-11 space-y-1">
                         <a href="{{ route('settings.tax-rates') }}" class="block px-3 py-2 rounded-lg text-sm {{ request()->routeIs('settings.tax-rates') ? 'text-accent bg-accent/10 font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-white/5' }}">Tax Rates</a>
+                        <a href="{{ route('settings.uoms') }}" class="block px-3 py-2 rounded-lg text-sm {{ request()->routeIs('settings.uoms') ? 'text-accent bg-accent/10 font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-white/5' }}">Units of Measure</a>
                         <a href="{{ route('settings.invoice-templates') }}" class="block px-3 py-2 rounded-lg text-sm {{ request()->routeIs('settings.invoice-templates') ? 'text-accent bg-accent/10 font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-white/5' }}">Invoice Templates</a>
+                        <a href="{{ route('settings.document-numbering') }}" class="block px-3 py-2 rounded-lg text-sm {{ request()->routeIs('settings.document-numbering') ? 'text-accent bg-accent/10 font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-white/5' }}">Document Numbering</a>
                         <a href="{{ route('settings.users') }}" class="block px-3 py-2 rounded-lg text-sm {{ request()->routeIs('settings.users') ? 'text-accent bg-accent/10 font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-white/5' }}">User Management</a>
                     </div>
                 </div>
@@ -411,7 +413,9 @@
                     <div x-show="subOpen" x-collapse>
                         <div class="py-1 pl-14 space-y-1">
                             <a href="{{ route('settings.tax-rates') }}" class="block px-3 py-2.5 rounded-lg text-sm {{ request()->routeIs('settings.tax-rates') ? 'text-accent bg-accent/10 font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-white/5' }}">Tax Rates</a>
+                            <a href="{{ route('settings.uoms') }}" class="block px-3 py-2.5 rounded-lg text-sm {{ request()->routeIs('settings.uoms') ? 'text-accent bg-accent/10 font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-white/5' }}">Units of Measure</a>
                             <a href="{{ route('settings.invoice-templates') }}" class="block px-3 py-2.5 rounded-lg text-sm {{ request()->routeIs('settings.invoice-templates') ? 'text-accent bg-accent/10 font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-white/5' }}">Invoice Templates</a>
+                            <a href="{{ route('settings.document-numbering') }}" class="block px-3 py-2.5 rounded-lg text-sm {{ request()->routeIs('settings.document-numbering') ? 'text-accent bg-accent/10 font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-white/5' }}">Document Numbering</a>
                             <a href="{{ route('settings.users') }}" class="block px-3 py-2.5 rounded-lg text-sm {{ request()->routeIs('settings.users') ? 'text-accent bg-accent/10 font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-white/5' }}">User Management</a>
                         </div>
                     </div>

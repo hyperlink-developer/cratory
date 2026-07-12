@@ -31,6 +31,7 @@ class Organization extends Model
         'email',
         'logo_path',
         'invoice_prefix',
+        'document_settings',
         'financial_year_start_month',
         'currency',
         'created_by',
@@ -46,6 +47,7 @@ class Organization extends Model
             'is_active' => 'boolean',
             'is_composition_tax_payer' => 'boolean',
             'financial_year_start_month' => 'integer',
+            'document_settings' => 'array',
         ];
     }
 

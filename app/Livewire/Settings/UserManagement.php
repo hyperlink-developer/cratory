@@ -8,44 +8,41 @@ use Illuminate\Support\Facades\Hash;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-#[Layout('components.layouts.app')]
-class UserManagement extends Component
-{
-    public $users = [];
-    public $showUserModal = false;
-    public $editMode = false;
-    public $editingUserId = null;
+    use Livewire\Attributes\Computed;
 
-    public $name = '';
-    public $email = '';
-    public $password = '';
-    public $role = '';
-
-    protected function rules()
+    #[Layout('components.layouts.app')]
+    class UserManagement extends Component
     {
-        $rules = [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'role' => 'required|string|in:' . implode(',', array_map(fn($r) => $r->value, OrgUserRole::cases())),
-        ];
+        public $showUserModal = false;
+        public $editMode = false;
+        public $editingUserId = null;
 
-        if (!$this->editMode) {
-            $rules['password'] = 'nullable|string|min:8';
+        public $name = '';
+        public $email = '';
+        public $password = '';
+        public $role = '';
+
+        protected function rules()
+        {
+            $rules = [
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|max:255',
+                'role' => 'required|string|in:' . implode(',', array_filter(array_map(fn($r) => $r->value, OrgUserRole::cases()), fn($v) => $v !== 'commander')),
+            ];
+
+            if (!$this->editMode) {
+                $rules['password'] = 'nullable|string|min:8';
+            }
+
+            return $rules;
         }
 
-        return $rules;
-    }
-
-    public function mount()
-    {
-        $this->loadUsers();
-    }
-
-    public function loadUsers()
-    {
-        $org = auth()->user()->currentOrganization;
-        $this->users = $org->users()->withPivot('role')->get();
-    }
+        #[Computed]
+        public function users()
+        {
+            $org = auth()->user()->currentOrganization;
+            return $org->users()->withPivot('role')->get();
+        }
 
     public function openAddModal()
     {
@@ -116,7 +113,6 @@ class UserManagement extends Component
         }
 
         $this->showUserModal = false;
-        $this->loadUsers();
     }
 
     public function removeUser($userId)
@@ -130,7 +126,6 @@ class UserManagement extends Component
         
         $org->users()->detach($userId);
         $this->dispatch('notify', message: 'User removed from organization.');
-        $this->loadUsers();
     }
 
     public function render()

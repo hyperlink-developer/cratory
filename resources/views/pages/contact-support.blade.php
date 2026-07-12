@@ -47,7 +47,7 @@
                         </div>
                         <h3 class="text-xl font-bold text-white mb-2">Support Hours</h3>
                         <p class="text-text-muted text-sm mb-4">We're online and ready to assist you.</p>
-                        <span class="text-white font-medium">Mon-Fri, 9am - 5pm EST</span>
+                        <span class="text-white font-medium">Mon-Fri, 9am - 5pm IST</span>
                     </div>
                 </div>
                 

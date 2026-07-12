@@ -15,6 +15,7 @@ class ReceiptForm extends Component
     public $openInvoices = [];
 
     public ?int $contactId = null;
+    public string $receiptNumber = '';
     public string $paymentDate = '';
     public string $paymentMode = 'bank_transfer';
     public string $reference = '';
@@ -28,6 +29,7 @@ class ReceiptForm extends Component
     {
         $this->contacts = Contact::active()->customers()->orderBy('display_name')->get();
         $this->paymentDate = date('Y-m-d');
+        $this->receiptNumber = app(DocumentNumberGenerator::class)->peek(auth()->user()->currentOrganization, 'REC');
     }
 
     public function updatedContactId($value)
@@ -70,6 +72,7 @@ class ReceiptForm extends Component
     {
         $this->validate([
             'contactId' => 'required|exists:contacts,id',
+            'receiptNumber' => 'required|string|max:255|unique:receipts,receipt_number',
             'paymentDate' => 'required|date',
             'amountReceived' => 'required|numeric|min:0.01',
             'paymentMode' => 'required|string',
@@ -83,12 +86,11 @@ class ReceiptForm extends Component
 
         DB::transaction(function () {
             $org = auth()->user()->currentOrganization;
-            $generator = app(DocumentNumberGenerator::class);
             
             $receipt = Receipt::create([
                 'organization_id' => $org->id,
                 'contact_id' => $this->contactId,
-                'receipt_number' => $generator->generate($org, 'REC'),
+                'receipt_number' => $this->receiptNumber,
                 'receipt_date' => $this->paymentDate,
                 'payment_mode' => $this->paymentMode,
                 'reference_number' => $this->reference,
