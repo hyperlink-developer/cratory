@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
+Route::post('/webhooks/razorpay', [\App\Http\Controllers\RazorpayWebhookController::class, 'handle'])->name('webhooks.razorpay');
+
 // Public routes
 Route::view('/', 'welcome')->name('welcome');
 Route::view('/privacy-policy', 'pages.privacy-policy')->name('privacy-policy');
@@ -41,6 +43,8 @@ Route::middleware(['auth', SetCurrentOrganization::class])->group(function () {
         // Invoices (Sales & Service)
         Route::get('/invoices', \App\Livewire\Invoices\InvoiceList::class)->name('invoices.index');
         Route::get('/invoices/create', \App\Livewire\Invoices\InvoiceForm::class)->name('invoices.create');
+        Route::get('/invoices/recurring', \App\Livewire\Invoices\RecurringInvoiceList::class)->name('invoices.recurring.index');
+        Route::get('/invoices/recurring/create', \App\Livewire\Invoices\RecurringInvoiceForm::class)->name('invoices.recurring.create');
         Route::get('/invoices/{invoice}/edit', \App\Livewire\Invoices\InvoiceForm::class)->name('invoices.edit');
         Route::get('/invoices/{invoice}/pdf', [\App\Http\Controllers\PdfController::class, 'downloadInvoice'])->name('invoices.pdf');
 
@@ -77,8 +81,11 @@ Route::middleware(['auth', SetCurrentOrganization::class])->group(function () {
         Route::get('/reports/profit-loss', \App\Livewire\Reports\ProfitLossReport::class)->name('reports.profit-loss');
         Route::get('/reports/trial-balance', \App\Livewire\Reports\TrialBalance::class)->name('reports.trial-balance');
         Route::get('/reports/balance-sheet', \App\Livewire\Reports\BalanceSheet::class)->name('reports.balance-sheet');
+        Route::get('/reports/gst', \App\Livewire\Reports\GstReport::class)->name('reports.gst');
+        Route::get('/reports/gstr2b-reconciliation', \App\Livewire\Reports\Gstr2bReconciliation::class)->name('reports.gstr2b');
         
         // Report Exports
+        Route::get('/reports/gst/export/gstr1/{period}', [\App\Http\Controllers\ReportExportController::class, 'exportGstr1'])->name('reports.gst.export-gstr1');
         Route::get('/reports/sales/export/pdf', [\App\Http\Controllers\ReportExportController::class, 'exportSalesPdf'])->name('reports.sales.pdf');
         Route::get('/reports/sales/export/csv', [\App\Http\Controllers\ReportExportController::class, 'exportSalesCsv'])->name('reports.sales.csv');
         Route::get('/reports/purchases/export/pdf', [\App\Http\Controllers\ReportExportController::class, 'exportPurchasesPdf'])->name('reports.purchases.pdf');
@@ -87,11 +94,14 @@ Route::middleware(['auth', SetCurrentOrganization::class])->group(function () {
         Route::get('/reports/trial-balance/export/pdf', [\App\Http\Controllers\ReportExportController::class, 'exportTrialBalancePdf'])->name('reports.trial-balance.pdf');
         Route::get('/reports/balance-sheet/export/pdf', [\App\Http\Controllers\ReportExportController::class, 'exportBalanceSheetPdf'])->name('reports.balance-sheet.pdf');
 
+        // Settings
+        Route::get('/settings/billing', \App\Livewire\Settings\Billing::class)->name('settings.billing');
         Route::get('/settings/tax-rates', \App\Livewire\Settings\TaxRates::class)->name('settings.tax-rates');
         Route::get('/settings/unit-of-measures', \App\Livewire\Settings\UnitOfMeasures::class)->name('settings.uoms');
         Route::get('/settings/invoice-templates', \App\Livewire\Settings\InvoiceTemplates::class)->name('settings.invoice-templates');
         Route::get('/settings/document-numbering', \App\Livewire\Settings\DocumentNumbering::class)->name('settings.document-numbering');
         Route::get('/settings/users', \App\Livewire\Settings\UserManagement::class)->name('settings.users');
+        Route::get('/settings/warehouses', \App\Livewire\Settings\Warehouses::class)->name('settings.warehouses');
 
         // Logout
         Route::post('/logout', function () {

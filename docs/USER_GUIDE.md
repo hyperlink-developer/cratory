@@ -127,18 +127,22 @@ When creating an invoice, you can **add a new customer on the fly** without leav
 
 ### How Inventory Tracking Works
 
-Cratory **automatically** updates your stock levels:
+Cratory **automatically** updates your stock levels across multiple warehouses:
 
 | Action | Effect on Stock |
 |---|---|
-| Create a **Sales Invoice** | Stock **decreases** |
-| Create a **Purchase Bill** | Stock **increases** |
+| Create a **Sales Invoice** (Sent/Paid) | Stock **decreases** |
+| Create a **Purchase Bill** (Received) | Stock **increases** |
 
-You don't need to manually adjust inventory — it all happens in the background!
+You don't need to manually adjust inventory — it all happens in the background when the invoice status changes!
+
+### Warehouses and Batches
+
+When creating products and receiving stock, you can specify exactly which warehouse the stock is held in. When creating an invoice, you select the warehouse to dispatch from, ensuring accurate physical stock counts across all your locations.
 
 ### Viewing Stock Levels
 
-On the **Inventory** page, you can see the current stock quantity for each product at a glance.
+On the **Inventory** page, you can see the current stock quantity for each product at a glance, broken down by warehouse.
 
 ---
 
@@ -170,12 +174,20 @@ This is the core feature of Cratory — creating professional invoices for your 
 
 | Status | Meaning |
 |---|---|
-| **Draft** | Saved but not yet sent. You can still edit it. |
-| **Sent** | Finalized and sent to the customer. Inventory is deducted. |
+| **Draft** | Saved but not yet sent. You can still edit it. (Stock is NOT deducted) |
+| **Sent** | Finalized and sent to the customer. (Stock is deducted) |
 | **Partial** | Customer has paid some, but not all. |
 | **Paid** | Fully paid — no balance remaining. |
 | **Overdue** | Past the due date and still unpaid. |
 | **Cancelled** | Voided — no longer active. |
+
+### E-Invoicing (GST Compliance)
+
+For businesses that meet the GST E-Invoicing threshold, Cratory supports direct integration with the GST Portal:
+1. Ensure your Organization and Customer GST details are filled out.
+2. The system automatically builds the exact NIC JSON schema (calculating CGST/SGST/IGST automatically based on Place of Supply).
+3. Click **Generate IRN** on the invoice view to instantly generate your Invoice Reference Number and signed QR code.
+4. You can also generate **E-Way Bills** directly from the same interface by entering the transporter details.
 
 ---
 

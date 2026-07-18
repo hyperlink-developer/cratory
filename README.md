@@ -14,7 +14,8 @@ Because this project is public but restricted, please note the following before 
 ## 🚀 Features
 
 - **Comprehensive Billing:** Create, edit, and manage Sales Invoices and Purchase Bills supporting both Credit and Cash basis.
-- **Automated Inventory:** Real-time stock tracking with automatic stock movements (`PurchaseIn` and `SaleOut`) directly tied to billing.
+- **Automated Inventory:** Real-time stock tracking with automatic stock movements (`PurchaseIn` and `SaleOut`) directly tied to billing status (Sent, Paid, Received).
+- **Direct E-Invoicing & GST:** Built-in engine to generate NIC-compliant JSON schemas for seamless IRN and E-Way Bill generation via GSP integration.
 - **Financial Accounting:** Automated double-entry ledger system. Every invoice, purchase, payment voucher, and receipt automatically posts corresponding journal entries.
 - **Payments & Receipts:** Easily manage vendor payments via Vouchers and customer collections via Receipts with automatic bill allocation.
 - **Robust Reporting:** Generate detailed financial reports including Profit & Loss, Trial Balance, Balance Sheet, Sales, and Purchases with PDF and CSV export options.

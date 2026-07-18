@@ -6,6 +6,24 @@
         </div>
 
         <div class="glass-card p-8 rounded-3xl border border-white/5 space-y-8">
+            <div class="border-b border-white/10 pb-8 mb-8">
+                <div class="flex items-center gap-4 mb-4">
+                    <span class="bg-primary/20 text-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">v1.1.0-beta</span>
+                    <span class="text-text-muted text-sm">July 2026</span>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-3">Inventory, E-Invoicing & Customization</h3>
+                <ul class="space-y-2 text-text-muted list-disc list-inside">
+                    <li>Added Automated Inventory Management (Warehouse stock deductions/additions)</li>
+                    <li>Added Direct E-Invoicing (GST) integration with NIC JSON schema support</li>
+                    <li>Introduced detailed Stock Movements matching SaleOut/PurchaseIn</li>
+                    <li>Added `warehouse_id` tracking for advanced inventory location management</li>
+                    <li>Added Document Numbering settings (Prefix, Next Number, Suffix) for all vouchers</li>
+                    <li>Added Custom Logo, Watermark, and Signature support to Invoice Templates</li>
+                    <li>Improved Dashboard KPIs, charts layout, and data syncing</li>
+                    <li>Upgraded User Management and Contact Support UI</li>
+                </ul>
+            </div>
+            
             <div class="border-b border-white/10 pb-8">
                 <div class="flex items-center gap-4 mb-4">
                     <span class="bg-primary/20 text-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">v1.0.0</span>

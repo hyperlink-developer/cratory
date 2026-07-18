@@ -38,6 +38,19 @@ class Invoice extends Model
         'terms_and_conditions',
         'place_of_supply',
         'created_by',
+        'irn',
+        'irn_status',
+        'ack_no',
+        'ack_date',
+        'signed_qr_code',
+        'signed_invoice',
+        'cancel_reason',
+        'eway_bill_number',
+        'eway_bill_date',
+        'eway_bill_valid_until',
+        'vehicle_number',
+        'transporter_id',
+        'warehouse_id',
     ];
 
     protected function casts(): array
@@ -88,6 +101,11 @@ class Invoice extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class);
     }
 
     // Scopes

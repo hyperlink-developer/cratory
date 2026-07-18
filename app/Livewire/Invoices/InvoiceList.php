@@ -40,6 +40,50 @@ class InvoiceList extends Component
         }
     }
 
+    public function sendInvoice(string $uuid, array $channels = ['mail'])
+    {
+        $invoice = Invoice::where('uuid', $uuid)->with('contact')->firstOrFail();
+        
+        if (!$invoice->contact) {
+            $this->dispatch('notify', ['message' => 'Invoice has no contact.', 'type' => 'error']);
+            return;
+        }
+
+        $invoice->contact->notify(new \App\Notifications\SendDocumentNotification($invoice, $channels));
+
+        $this->dispatch('notify', ['message' => 'Invoice queued for sending.', 'type' => 'success']);
+    }
+
+    public function generateIrn(string $uuid, \App\Services\GST\EInvoiceService $service)
+    {
+        $invoice = Invoice::where('uuid', $uuid)->firstOrFail();
+        
+        try {
+            if ($service->generateIrn($invoice)) {
+                $this->dispatch('notify', ['message' => 'IRN generated successfully.', 'type' => 'success']);
+            } else {
+                $this->dispatch('notify', ['message' => 'Invoice already has an IRN.', 'type' => 'warning']);
+            }
+        } catch (\Exception $e) {
+            $this->dispatch('notify', ['message' => 'Failed to generate IRN: ' . $e->getMessage(), 'type' => 'error']);
+        }
+    }
+
+    public function generateEWayBill(string $uuid, \App\Services\GST\EInvoiceService $service)
+    {
+        $invoice = Invoice::where('uuid', $uuid)->firstOrFail();
+        
+        try {
+            if ($service->generateEWayBill($invoice)) {
+                $this->dispatch('notify', ['message' => 'E-Way Bill generated successfully.', 'type' => 'success']);
+            } else {
+                $this->dispatch('notify', ['message' => 'Invoice already has an E-Way Bill.', 'type' => 'warning']);
+            }
+        } catch (\Exception $e) {
+            $this->dispatch('notify', ['message' => 'Failed to generate E-Way Bill: ' . $e->getMessage(), 'type' => 'error']);
+        }
+    }
+
     public function render()
     {
         $invoices = Invoice::with(['contact'])

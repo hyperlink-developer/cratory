@@ -32,6 +32,8 @@ class Product extends Model
         'reorder_level',
         'image_path',
         'is_active',
+        'is_batch_tracked',
+        'low_stock_threshold',
     ];
 
     protected function casts(): array
@@ -44,6 +46,8 @@ class Product extends Model
             'current_stock' => 'decimal:2',
             'reorder_level' => 'decimal:2',
             'is_active' => 'boolean',
+            'is_batch_tracked' => 'boolean',
+            'low_stock_threshold' => 'decimal:2',
         ];
     }
 
@@ -67,6 +71,11 @@ class Product extends Model
     public function stockMovements(): HasMany
     {
         return $this->hasMany(StockMovement::class);
+    }
+
+    public function batches(): HasMany
+    {
+        return $this->hasMany(ProductBatch::class);
     }
 
     // Scopes
