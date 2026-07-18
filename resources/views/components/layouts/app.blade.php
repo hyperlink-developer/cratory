@@ -164,6 +164,7 @@
                         <a href="{{ route('settings.invoice-templates') }}" class="block px-3 py-2 rounded-lg text-sm {{ request()->routeIs('settings.invoice-templates') ? 'text-accent bg-accent/10 font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-white/5' }}">Invoice Templates</a>
                         <a href="{{ route('settings.document-numbering') }}" class="block px-3 py-2 rounded-lg text-sm {{ request()->routeIs('settings.document-numbering') ? 'text-accent bg-accent/10 font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-white/5' }}">Document Numbering</a>
                         <a href="{{ route('settings.users') }}" class="block px-3 py-2 rounded-lg text-sm {{ request()->routeIs('settings.users') ? 'text-accent bg-accent/10 font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-white/5' }}">User Management</a>
+                        <a href="{{ route('settings.warehouses') }}" class="block px-3 py-2 rounded-lg text-sm {{ request()->routeIs('settings.warehouses') ? 'text-accent bg-accent/10 font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-white/5' }}">Warehouses</a>
                     </div>
                 </div>
             </div>
@@ -417,6 +418,7 @@
                             <a href="{{ route('settings.invoice-templates') }}" class="block px-3 py-2.5 rounded-lg text-sm {{ request()->routeIs('settings.invoice-templates') ? 'text-accent bg-accent/10 font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-white/5' }}">Invoice Templates</a>
                             <a href="{{ route('settings.document-numbering') }}" class="block px-3 py-2.5 rounded-lg text-sm {{ request()->routeIs('settings.document-numbering') ? 'text-accent bg-accent/10 font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-white/5' }}">Document Numbering</a>
                             <a href="{{ route('settings.users') }}" class="block px-3 py-2.5 rounded-lg text-sm {{ request()->routeIs('settings.users') ? 'text-accent bg-accent/10 font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-white/5' }}">User Management</a>
+                            <a href="{{ route('settings.warehouses') }}" class="block px-3 py-2.5 rounded-lg text-sm {{ request()->routeIs('settings.warehouses') ? 'text-accent bg-accent/10 font-semibold' : 'text-text-secondary hover:text-text-primary hover:bg-white/5' }}">Warehouses</a>
                         </div>
                     </div>
                 </div>

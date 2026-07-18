@@ -25,3 +25,7 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+Cratory-PRD.md
+Cratory-PRD-Phase2-GST-SaaS.md
+tests/Feature/InventoryServiceTest.php
+preview_test.html

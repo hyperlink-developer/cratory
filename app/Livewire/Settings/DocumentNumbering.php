@@ -7,13 +7,30 @@ use Livewire\Component;
 class DocumentNumbering extends Component
 {
     public $invoicePrefix = 'INV';
-    public $invoiceFormat = '{PREFIX}-{FY}-{SEQ}';
+    public $invoicePattern = '{PREFIX}{SEP}{FY}{SEP}{SEQ}';
+    public $invoiceSeparator = '-';
 
     public $receiptPrefix = 'REC';
-    public $receiptFormat = '{PREFIX}-{FY}-{SEQ}';
+    public $receiptPattern = '{PREFIX}{SEP}{FY}{SEP}{SEQ}';
+    public $receiptSeparator = '-';
 
     public $voucherPrefix = 'PAY';
-    public $voucherFormat = '{PREFIX}-{FY}-{SEQ}';
+    public $voucherPattern = '{PREFIX}{SEP}{FY}{SEP}{SEQ}';
+    public $voucherSeparator = '-';
+
+    private function parseFormat($format)
+    {
+        $separators = ['-', '/', ' '];
+        foreach ($separators as $sep) {
+            if (str_contains($format, $sep)) {
+                return [
+                    'pattern' => str_replace($sep, '{SEP}', $format),
+                    'separator' => $sep,
+                ];
+            }
+        }
+        return ['pattern' => str_replace('-', '{SEP}', $format), 'separator' => '-']; // Default fallback
+    }
 
     public function mount()
     {
@@ -21,33 +38,45 @@ class DocumentNumbering extends Component
         $settings = $org->document_settings ?? [];
 
         $this->invoicePrefix = $settings['invoice']['prefix'] ?? $org->invoice_prefix ?? 'INV';
-        $this->invoiceFormat = $settings['invoice']['format'] ?? '{PREFIX}-{DOC_TYPE}-{FY}-{SEQ}';
+        $invParsed = $this->parseFormat($settings['invoice']['format'] ?? '{PREFIX}-{FY}-{SEQ}');
+        $this->invoicePattern = $invParsed['pattern'];
+        $this->invoiceSeparator = $invParsed['separator'];
 
         $this->receiptPrefix = $settings['receipt']['prefix'] ?? 'REC';
-        $this->receiptFormat = $settings['receipt']['format'] ?? '{PREFIX}-{FY}-{SEQ}';
+        $recParsed = $this->parseFormat($settings['receipt']['format'] ?? '{PREFIX}-{FY}-{SEQ}');
+        $this->receiptPattern = $recParsed['pattern'];
+        $this->receiptSeparator = $recParsed['separator'];
 
         $this->voucherPrefix = $settings['voucher']['prefix'] ?? 'PAY';
-        $this->voucherFormat = $settings['voucher']['format'] ?? '{PREFIX}-{FY}-{SEQ}';
+        $vouParsed = $this->parseFormat($settings['voucher']['format'] ?? '{PREFIX}-{FY}-{SEQ}');
+        $this->voucherPattern = $vouParsed['pattern'];
+        $this->voucherSeparator = $vouParsed['separator'];
     }
 
     public function save()
     {
         $this->validate([
             'invoicePrefix' => 'required|string|max:10',
-            'invoiceFormat' => 'required|string|max:50',
             'receiptPrefix' => 'required|string|max:10',
-            'receiptFormat' => 'required|string|max:50',
             'voucherPrefix' => 'required|string|max:10',
-            'voucherFormat' => 'required|string|max:50',
         ]);
 
         $org = auth()->user()->currentOrganization;
         
         $settings = $org->document_settings ?? [];
         
-        $settings['invoice'] = ['prefix' => $this->invoicePrefix, 'format' => $this->invoiceFormat];
-        $settings['receipt'] = ['prefix' => $this->receiptPrefix, 'format' => $this->receiptFormat];
-        $settings['voucher'] = ['prefix' => $this->voucherPrefix, 'format' => $this->voucherFormat];
+        $settings['invoice'] = [
+            'prefix' => $this->invoicePrefix, 
+            'format' => str_replace('{SEP}', $this->invoiceSeparator, $this->invoicePattern)
+        ];
+        $settings['receipt'] = [
+            'prefix' => $this->receiptPrefix, 
+            'format' => str_replace('{SEP}', $this->receiptSeparator, $this->receiptPattern)
+        ];
+        $settings['voucher'] = [
+            'prefix' => $this->voucherPrefix, 
+            'format' => str_replace('{SEP}', $this->voucherSeparator, $this->voucherPattern)
+        ];
 
         $org->document_settings = $settings;
         $org->save();

@@ -210,6 +210,18 @@
         </table>
     </div>
 
+    @if($invoice->irn || $invoice->eway_bill_number)
+    <div style="margin-bottom: 20px; font-size: 11px; padding: 10px; background-color: #f9fafb; border: 1px solid #eee;">
+        @if($invoice->irn)
+            <p style="margin: 0 0 4px 0;"><strong>IRN:</strong> {{ $invoice->irn }}</p>
+            <p style="margin: 0 0 4px 0;"><strong>Ack No:</strong> {{ $invoice->ack_no }} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Ack Date:</strong> {{ $invoice->ack_date }}</p>
+        @endif
+        @if($invoice->eway_bill_number)
+            <p style="margin: 0;"><strong>E-Way Bill No:</strong> {{ $invoice->eway_bill_number }} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Valid Until:</strong> {{ $invoice->eway_bill_valid_until }}</p>
+        @endif
+    </div>
+    @endif
+
     <table class="items-table">
         <thead>
             <tr>

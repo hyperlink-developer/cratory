@@ -24,6 +24,8 @@ class StockMovement extends Model
         'balance_after',
         'created_by',
         'created_at',
+        'warehouse_id',
+        'product_batch_id',
     ];
 
     protected function casts(): array
@@ -51,5 +53,15 @@ class StockMovement extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class);
+    }
+
+    public function batch(): BelongsTo
+    {
+        return $this->belongsTo(ProductBatch::class, 'product_batch_id');
     }
 }

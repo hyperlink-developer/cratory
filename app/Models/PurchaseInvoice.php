@@ -19,7 +19,7 @@ class PurchaseInvoice extends Model
         'organization_id', 'invoice_basis', 'purchase_number', 'vendor_bill_number',
         'contact_id', 'purchase_date', 'due_date',
         'subtotal', 'discount_total', 'tax_total', 'round_off', 'grand_total',
-        'amount_paid', 'balance_due', 'status', 'attachment_path', 'created_by',
+        'amount_paid', 'balance_due', 'status', 'attachment_path', 'created_by', 'warehouse_id',
     ];
 
     protected function casts(): array
@@ -44,6 +44,7 @@ class PurchaseInvoice extends Model
     public function voucherAllocations(): HasMany { return $this->hasMany(PaymentVoucherAllocation::class); }
     public function stockMovements(): MorphMany { return $this->morphMany(StockMovement::class, 'reference'); }
     public function creator(): BelongsTo { return $this->belongsTo(User::class, 'created_by'); }
+    public function warehouse(): BelongsTo { return $this->belongsTo(Warehouse::class); }
 
     public function recalculateAmountPaid(): void
     {

@@ -4,13 +4,27 @@ namespace App\Http\Controllers;
 
 use App\Models\Invoice;
 use App\Models\PurchaseInvoice;
+use App\Models\GstReportPeriod;
+use App\Services\GST\Gstr1ReportService;
+use App\Exports\Gstr1Export;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use App\Models\AccountGroup;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReportExportController extends Controller
 {
+    public function exportGstr1(GstReportPeriod $period)
+    {
+        abort_if($period->organization_id !== auth()->user()->current_organization_id, 403);
+        
+        $service = new Gstr1ReportService($period);
+        $monthYear = \Carbon\Carbon::parse($period->period_start)->format('M-Y');
+        
+        return Excel::download(new Gstr1Export($service), "GSTR-1-{$monthYear}.xlsx");
+    }
+
     public function exportSalesPdf(Request $request)
     {
         $startDate = $request->query('start', date('Y-m-01'));

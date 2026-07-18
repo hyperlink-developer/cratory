@@ -1,5 +1,24 @@
 # Release Notes
 
+## [v1.1.0-beta] - 2026-07-18
+
+### Added
+- **Advanced Inventory Management:** The system now automatically manages inventory. When a Sales Invoice is finalized (Sent, Paid), stock is deducted. When a Purchase Bill is Received, stock is added back.
+- **Direct E-Invoicing (GST):** Added underlying infrastructure to generate IRNs (Invoice Reference Numbers) and E-Way Bills directly from the app via GSP integrations.
+- **NIC JSON Schema Engine:** The system dynamically maps line items, tax distributions (CGST/SGST/IGST depending on inter-state rules), discounts, and buyer/seller information to perfectly match the National Informatics Centre (NIC) strict JSON format.
+- **Document Numbering Configuration:** Administrators can now customize Prefix, Sequence, and Suffix for Invoices, Bills, Receipts, and Vouchers from Settings.
+- **Advanced PDF Customization:** You can now upload a custom Logo, Watermark image, and Signature image directly to Invoice Templates.
+
+### Changed
+- **Database Schema Upgrades:** `invoices` and `purchase_invoices` now support `warehouse_id` to track the exact location of stock movements.
+- **Stock Movement Architecture:** Stock movements now track warehouse IDs and batch IDs (where applicable) and perfectly reflect `SaleOut` and `PurchaseIn` scenarios.
+- **Dashboard & UI Improvements:** Refined Dashboard layout, fixed KPI syncing, and upgraded the User Management and Support screens.
+
+### Fixed
+- **Local Environment Routing:** Fixed routing configuration that previously prevented `http://localhost/Cratory` from serving correctly outside of virtual host configurations.
+- **File Permissions:** Resolved a 500 server error caused by improper file permissions on the storage/ and bootstrap/ directories.
+
+---
 ## [v1.0.0-beta] - 2026-07-07
 
 ### Added

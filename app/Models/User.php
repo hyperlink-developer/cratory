@@ -7,10 +7,12 @@ use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     use HasFactory, Notifiable, HasUuid;
 
@@ -19,6 +21,7 @@ class User extends Authenticatable
         'email',
         'password',
         'is_commander',
+        'is_platform_admin',
         'phone',
         'avatar_path',
         'current_organization_id',
@@ -35,7 +38,13 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_commander' => 'boolean',
+            'is_platform_admin' => 'boolean',
         ];
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->is_commander && $this->is_platform_admin;
     }
 
     // Relationships
